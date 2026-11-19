@@ -1,0 +1,34 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js build and cache
+/.next/
+/.build/
+/out/
+/build
+*.tsbuildinfo
+
+# environment
+.env*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# python
+__pycache__/
+*.pyc
+
+# root test captures and test glbs
+/*.png
+/*.jpg
+/*.glb

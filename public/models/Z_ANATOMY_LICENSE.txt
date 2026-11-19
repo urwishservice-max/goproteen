@@ -1,0 +1,28 @@
+Z-ANATOMY / BODYPARTS3D 3D SKELETAL MODEL LICENSE RECORD
+===========================================================
+
+License: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+License URL: https://creativecommons.org/licenses/by-sa/4.0/
+
+ORIGINAL SOURCE & REPOSITORY:
+Repository: Models-of-human-anatomy-master (Z-Anatomy)
+Original Project: Z-Anatomy - The libre 3D atlas of anatomy
+Website: https://www.z-anatomy.net / https://github.com/Z-Anatomy
+
+MODELS ATTRIBUTION:
+- "BodyParts3D - The Database Center for Life Science - CC-BY-SA 2.1 Japan"
+  Original model repository: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html
+- "Z-Anatomy - The libre 3D atlas of anatomy - CC-BY-SA 4.0"
+
+AUTHORS:
+- Kousaku OKUBO (Original model 'BodyParts3D')
+- Gauthier KERVYN (Design, 3D, anatomy)
+- Marcin ZIELINSKI (Blender add-on)
+- Lluis VINENT (Unity development)
+
+DERIVATIVE WORK DETAILS:
+- Source file: Startup.blend (Collection '1: Skeletal system')
+- Exported asset: public/models/z_anatomy_skeleton.glb
+- Components: Full human anatomical skeleton (271 bones), exported for educational web visualization.
+- Modifications: Filtered to complete skeletal structure, assigned realistic ivory bone PBR shading and custom anatomical region tags for interactive joint education (Spine, Hip, Knee).
+- Distribution: Distributed under CC BY-SA 4.0 in accordance with the upstream license.
