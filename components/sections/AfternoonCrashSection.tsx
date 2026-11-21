@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const MEALS = [
   { id: 'rice', label: 'Rice + roti' },
@@ -11,15 +11,61 @@ const MEALS = [
 export default function AfternoonCrashSection() {
   const [activeMealId, setActiveMealId] = useState<string>('goproteen');
 
+  // Ensure global 3D bar canvas and ambient orb are completely hidden in this section
+  useEffect(() => {
+    const hideGlobal3D = () => {
+      const cv = document.getElementById('c');
+      if (cv) {
+        cv.style.opacity = '0';
+        cv.style.visibility = 'hidden';
+        cv.style.pointerEvents = 'none';
+      }
+      const orb = document.getElementById('orb');
+      if (orb) {
+        orb.style.opacity = '0';
+      }
+    };
+
+    hideGlobal3D();
+
+    const crashSec = document.getElementById('crash');
+    if (!crashSec) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            document.body.classList.add('in-crash-section');
+            hideGlobal3D();
+          } else {
+            document.body.classList.remove('in-crash-section');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(crashSec);
+
+    return () => {
+      observer.disconnect();
+      document.body.classList.remove('in-crash-section');
+    };
+  }, []);
+
   return (
     <section
       id="crash"
-      className="relative w-full min-h-[90vh] flex items-center justify-center px-6 sm:px-12 lg:px-20 py-16 lg:py-24 overflow-hidden"
-      style={{ backgroundColor: '#FDFBF7' }}
+      className="relative w-full min-h-[85vh] flex items-center justify-center px-6 sm:px-12 lg:px-20 py-12 lg:py-16 overflow-hidden"
+      style={{
+        backgroundColor: '#FDFBF7',
+        position: 'relative',
+        zIndex: 20,
+      }}
       data-bar="0 0 0 0 0 0 0 0"
       data-orb="0 0 0 0 0"
     >
-      <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+      <div className="relative z-20 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
         {/* Left Column: Heading, description, and interactive meal pill buttons */}
         <div className="lg:col-span-6 flex flex-col justify-center">
           <h2
@@ -64,20 +110,20 @@ export default function AfternoonCrashSection() {
           </div>
         </div>
 
-        {/* Right Column: Sleeping man (transparent cutout) with floating low battery directly above head */}
+        {/* Right Column: Sleeping man with floating low battery locked directly above head */}
         <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end">
-          <div className="relative w-full max-w-[620px] select-none pt-12">
-            {/* Crisp Floating Battery Icon positioned directly above head */}
+          <div className="relative w-full max-w-[580px] select-none mx-auto lg:ml-auto">
+            {/* Crisp Floating Battery Icon in exact original position directly hovering above hair */}
             <div
-              className="absolute z-10 flex items-center select-none"
+              className="absolute z-20 flex items-center select-none pointer-events-none"
               style={{
-                top: '0%',
-                left: '38%',
+                top: '26.4%',
+                left: '40.2%',
               }}
             >
               {/* Battery Body Capsule */}
               <div
-                className="relative w-[118px] h-[55px] rounded-[17px] border-[3.5px] border-[#230E2E] bg-white/95 p-[3.5px] flex items-center shadow-md shadow-[#230E2E]/10"
+                className="relative w-[114px] h-[52px] rounded-[16px] border-[3.5px] border-[#230E2E] bg-white/95 p-[3px] flex items-center shadow-md shadow-[#230E2E]/10"
               >
                 {/* Red Depleted Charge Level */}
                 <div
@@ -90,7 +136,7 @@ export default function AfternoonCrashSection() {
               </div>
               {/* Battery Terminal Knob */}
               <div
-                className="w-[8px] h-[22px] bg-[#230E2E] rounded-r-[4px] ml-[-1px]"
+                className="w-[8px] h-[20px] bg-[#230E2E] rounded-r-[4px] ml-[-1px]"
               />
             </div>
 

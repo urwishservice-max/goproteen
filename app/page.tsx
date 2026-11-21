@@ -42,9 +42,7 @@ const BoneFoundationExperience = dynamic(() => import('../components/bone/BoneFo
   ),
 });
 
-const AfternoonCrashSection = dynamic(() => import('../components/sections/AfternoonCrashSection'), {
-  ssr: false,
-});
+import AfternoonCrashSection from '../components/sections/AfternoonCrashSection';
 
 export default function GoProteenPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -681,10 +679,11 @@ export default function GoProteenPage() {
 
       document.body.classList.toggle('v', s.dataset.theme === 'v');
       document.body.classList.toggle('in-bone-section', s.id === 'bone');
+      document.body.classList.toggle('in-crash-section', s.id === 'crash');
 
       const orb = $('#orb');
       if (orb) {
-        if (s.id === 'bone') {
+        if (s.id === 'bone' || s.id === 'crash') {
           orb.style.opacity = '0';
         } else {
           orb.style.transform = `translate(${o[0] * 22}vw,${o[1] * 10}vh) scale(${o[2]})`;
@@ -707,12 +706,14 @@ export default function GoProteenPage() {
         if (cvEl) {
           cvEl.style.opacity = '0';
           cvEl.style.visibility = 'hidden';
+          cvEl.style.pointerEvents = 'none';
         }
       } else {
         const cvEl = $('#c') as HTMLCanvasElement | null;
         if (cvEl && s.id !== 'bone' && s.id !== 'crash') {
           cvEl.style.opacity = '1';
           cvEl.style.visibility = 'visible';
+          cvEl.style.pointerEvents = 'none';
         }
         T.x = m ? 0 : k[0];
         T.y = m && k[5] < 0.5 ? k[1] * 0.5 : k[1];
