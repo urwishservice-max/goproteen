@@ -44,8 +44,8 @@ const BoneFoundationExperience = dynamic(() => import('../components/bone/BoneFo
 
 import AfternoonCrashSection from '../components/sections/AfternoonCrashSection';
 
-const Product3DStoryExperience = dynamic(
-  () => import('../components/sections/Product3DStoryExperience'),
+const ProductStoryFlow = dynamic(
+  () => import('../components/product-story'),
   { ssr: false }
 );
 
@@ -1890,18 +1890,18 @@ export default function GoProteenPage() {
         </details>
         <div className="sp"></div>
 
-        {/* Section 5: GoProteen 3D Scroll Storytelling Experience */}
-        <section
+        {/* Section 5: GoProteen Long-Scrolling Multi-Section 3D Product Storytelling */}
+        <div
           id="product-story"
-          className="relative"
+          className="relative w-full"
           style={{
             backgroundColor: '#FDFBF7',
             position: 'relative',
             zIndex: 10,
           }}
         >
-          <Product3DStoryExperience />
-        </section>
+          <ProductStoryFlow />
+        </div>
         <div className="sp"></div>
 
         {/* Section 6: The repair kit */}
