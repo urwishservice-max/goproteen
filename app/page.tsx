@@ -2307,7 +2307,7 @@ export default function GoProteenPage() {
         </section>
         <div className="sp"></div>
 
-        {/* Section 12: Pricing / Order */}
+        {/* Section 12: Closing / First Bite */}
         <section
           data-bar="0 0.02 1.35 0 0 1 0 0"
           data-orb="0 0 1.3 330 .8"
@@ -2316,46 +2316,10 @@ export default function GoProteenPage() {
         >
           <span className="mono r">10 — Today</span>
           <div className="big">FIRST BITE</div>
-          <div className="price r" style={{ marginTop: '42vh', textAlign: 'left', width: '100%' }}>
-            <div>
-              <span className="mono">Single</span>
-              <strong>₹ 120</strong>
-              <a className="btn crunch" href="#">
-                Order
-              </a>
-            </div>
-            <div className="hot">
-              <span className="mono" style={{ color: '#fff' }}>
-                Most popular · Box of 6
-              </span>
-              <strong>₹ 660</strong>
-              <a
-                className="btn crunch"
-                style={{ background: '#fff', color: '#14091F', borderColor: '#fff' }}
-                href="#"
-              >
-                Order
-              </a>
-            </div>
-            <div>
-              <span className="mono">Box of 12</span>
-              <strong>₹ 1,200</strong>
-              <a className="btn crunch" href="#">
-                Order
-              </a>
-            </div>
-            <div>
-              <span className="mono">Subscribe &amp; save</span>
-              <strong>₹ 999/mo</strong>
-              <a className="btn crunch" href="#">
-                Start
-              </a>
-            </div>
-          </div>
           <p
             className="r"
             style={{
-              margin: '6vh auto 0',
+              margin: '36vh auto 0',
               maxWidth: '46ch',
               textAlign: 'center',
               color: 'var(--fg)',
