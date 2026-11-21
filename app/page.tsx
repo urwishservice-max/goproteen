@@ -43,6 +43,7 @@ const BoneFoundationExperience = dynamic(() => import('../components/bone/BoneFo
 });
 
 import AfternoonCrashSection from '../components/sections/AfternoonCrashSection';
+import SynbioticAdvantageSection from '../components/sections/SynbioticAdvantageSection';
 
 const ProductStoryFlow = dynamic(
   () => import('../components/product-story'),
@@ -1902,6 +1903,10 @@ export default function GoProteenPage() {
         >
           <ProductStoryFlow />
         </div>
+
+        {/* Section 5.5: The Synbiotic Advantage - Prebiotic Fiber & Probiotics */}
+        <SynbioticAdvantageSection />
+
         <div className="sp"></div>
 
         {/* Section 6: The repair kit */}
