@@ -62,6 +62,26 @@ const JOINTS_DATA = {
 
 export default function BoneFoundationExperience({ initialStep = 0 }) {
   const [activeStep, setActiveStep] = useState(initialStep);
+
+  // Support ?step=2 query param for direct navigation/previewing
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const stepParam = params.get('step');
+      if (stepParam !== null) {
+        const s = parseInt(stepParam, 10);
+        if (!isNaN(s) && s >= 0 && s < STEPS.length) {
+          setActiveStep(s);
+          setTimeout(() => {
+            const sec = document.getElementById('bone-experience-section');
+            if (sec) {
+              sec.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+          }, 100);
+        }
+      }
+    }
+  }, []);
   // Default to null: starting state has NO selected parts
   const [selectedJoint, setSelectedJoint] = useState(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -372,19 +392,12 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
 
         {/* Step 3: Mineral Matrix (Collagen & Calcium Phosphate) */}
         {activeStep === 2 && (
-          <div className="w-full space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/60 pb-3">
-              <div>
-                <h3 className="text-2xl font-light text-[#14091F]">
-                  The Collagen &amp; Calcium-Phosphate Scaffold
-                </h3>
-              </div>
-              <p className="text-xs text-stone-500 max-w-md italic">
-                “Without a complete amino acid framework to lock calcium into place… your internal structure accelerates its breakdown.”
-              </p>
-            </div>
-            <CollagenExplorer onNext={() => goToStep(3)} />
-          </div>
+          <CollagenExplorer
+            onNext={() => goToStep(3)}
+            onPrev={() => goToStep(1)}
+            isPlayingAudio={isPlayingAudio}
+            onToggleAudio={toggleNarration}
+          />
         )}
 
         {/* Step 4: Bone Remodeling (Living Cellular Dynamics & Horizon) */}
