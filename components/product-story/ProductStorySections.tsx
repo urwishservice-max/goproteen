@@ -80,7 +80,7 @@ export default function ProductStorySections() {
           </p>
 
           {/* Reserved 3D Model Center Stage Height */}
-          <div className="w-full h-[280px] sm:h-[340px]" />
+          <div className="w-full h-[240px] sm:h-[300px]" />
 
           <div className="flex items-center gap-3 text-xs font-mono text-[#8A7993] mt-6">
             <span>Scroll naturally to travel through the experience</span>
@@ -97,8 +97,8 @@ export default function ProductStorySections() {
         className="relative w-full min-h-[85vh] py-24 sm:py-32 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80"
       >
         <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pointer-events-auto">
-          {/* Left Text */}
-          <div className="lg:col-span-6 flex flex-col items-start text-left">
+          {/* Left Text (Constrained to avoid any overlap) */}
+          <div className="lg:col-span-6 flex flex-col items-start text-left max-w-lg lg:max-w-[480px]">
             <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] mb-4">
               02 — The Problem With Traditional Protein
             </span>
@@ -114,7 +114,7 @@ export default function ProductStorySections() {
               Gas. Slump.
             </h2>
 
-            <div className="space-y-4 mb-6 text-[#5D5066] text-base sm:text-lg leading-[1.65] font-normal max-w-lg">
+            <div className="space-y-4 mb-6 text-[#5D5066] text-base sm:text-lg leading-[1.65] font-normal">
               <p>
                 Traditional whey or raw plant powders often trigger{' '}
                 <strong className="text-[#14091F] font-medium">heavy gastric bloat</strong>...
@@ -134,7 +134,7 @@ export default function ProductStorySections() {
             </div>
           </div>
 
-          {/* Right Area: Reserved for persistent 3D product (travels to the right) */}
+          {/* Right Area: Reserved for persistent 3D product */}
           <div className="lg:col-span-6 h-[340px] sm:h-[460px] pointer-events-none" />
         </div>
       </section>
@@ -145,11 +145,11 @@ export default function ProductStorySections() {
         className="relative w-full min-h-[85vh] py-24 sm:py-32 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80"
       >
         <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pointer-events-auto">
-          {/* Left Area: Reserved for persistent 3D product (travels to the left, tilted vertical) */}
+          {/* Left Area: Reserved for persistent 3D product */}
           <div className="lg:col-span-6 order-2 lg:order-1 h-[340px] sm:h-[460px] pointer-events-none" />
 
           {/* Right Text */}
-          <div className="lg:col-span-6 order-1 lg:order-2 flex flex-col items-start text-left lg:pl-6">
+          <div className="lg:col-span-6 order-1 lg:order-2 flex flex-col items-start text-left lg:pl-10 max-w-lg lg:max-w-[480px]">
             <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] mb-4">
               03 — The Cellular Shift
             </span>
@@ -164,11 +164,11 @@ export default function ProductStorySections() {
               </span>
             </h2>
 
-            <p className="text-[#5D5066] text-base sm:text-lg leading-[1.65] font-normal max-w-lg mb-4">
+            <p className="text-[#5D5066] text-base sm:text-lg leading-[1.65] font-normal mb-4">
               Meet <strong className="text-[#14091F] font-medium">GoProteen...</strong>
             </p>
 
-            <p className="text-[#5D5066] text-base sm:text-lg leading-[1.65] font-normal max-w-lg mb-8">
+            <p className="text-[#5D5066] text-base sm:text-lg leading-[1.65] font-normal mb-8">
               Powered by clinically studied{' '}
               <span className="text-[#14091F] font-medium">Fermented Yeast Protein</span>. Unlocking instantaneous cellular bioavailability with zero lactose and zero gastric distress.
             </p>
@@ -195,7 +195,7 @@ export default function ProductStorySections() {
       >
         <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pointer-events-auto">
           {/* Left Column: Typographic Feature Statements */}
-          <div className="lg:col-span-6 flex flex-col items-start text-left">
+          <div className="lg:col-span-6 flex flex-col items-start text-left max-w-lg lg:max-w-[480px]">
             <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] mb-4">
               04 — The Protein Advantage
             </span>
@@ -211,7 +211,7 @@ export default function ProductStorySections() {
             </h2>
 
             {/* Statement 01 */}
-            <div className="mb-8 max-w-lg">
+            <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <span className="w-2 h-2 rounded-full bg-gradient-to-r from-[#9333EA] to-[#E11D48]" />
                 <h3 className="text-xl sm:text-2xl font-light text-[#14091F] tracking-tight">
@@ -224,7 +224,7 @@ export default function ProductStorySections() {
             </div>
 
             {/* Statement 02 */}
-            <div className="mb-8 max-w-lg">
+            <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <span className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E11D48] to-[#F59E0B]" />
                 <h3 className="text-xl sm:text-2xl font-light text-[#14091F] tracking-tight">
@@ -237,7 +237,7 @@ export default function ProductStorySections() {
             </div>
           </div>
 
-          {/* Right Area: Reserved for persistent 3D product (zoomed front wrapper) */}
+          {/* Right Area: Reserved for persistent 3D product */}
           <div className="lg:col-span-6 h-[340px] sm:h-[460px] pointer-events-none" />
         </div>
       </section>
@@ -264,7 +264,7 @@ export default function ProductStorySections() {
           </h2>
 
           {/* Reserved central area for persistent 3D model */}
-          <div className="w-full h-[260px] sm:h-[320px] pointer-events-none" />
+          <div className="w-full h-[220px] sm:h-[260px] pointer-events-none" />
 
           <p
             className="text-[2.0rem] sm:text-[2.8rem] lg:text-[3.2rem] font-light tracking-tight leading-[1.18] text-[#5D5066] max-w-2xl mt-4"
@@ -302,16 +302,19 @@ export default function ProductStorySections() {
         </div>
 
         {/* Benefit 01: Product Right */}
-        <div className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80">
+        <div
+          id="story-benefit-1"
+          className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80"
+        >
           <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pointer-events-auto">
-            <div className="lg:col-span-6 flex flex-col items-start text-left">
+            <div className="lg:col-span-6 flex flex-col items-start text-left max-w-lg lg:max-w-[480px]">
               <span className="px-2.5 py-1 rounded-full bg-[#230E2E] text-white text-[11px] font-mono mb-4">
                 01 · Sustained Cellular Vitality
               </span>
               <h3 className="text-[2.4rem] sm:text-[3.4rem] lg:text-[4.0rem] font-light tracking-tight leading-[1.08] text-[#14091F] mb-6">
                 Finish your workday feeling vibrant, active, and fully alive.
               </h3>
-              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed max-w-lg font-normal mb-6">
+              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed font-normal mb-6">
                 No 3 PM sluggishness or mental fog. Consistent, clean cellular fuel that lasts straight through your evening.
               </p>
               <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#8A7993]">
@@ -324,17 +327,20 @@ export default function ProductStorySections() {
         </div>
 
         {/* Benefit 02: Product Left */}
-        <div className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80">
+        <div
+          id="story-benefit-2"
+          className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80"
+        >
           <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pointer-events-auto">
             <div className="lg:col-span-6 h-[320px] pointer-events-none" />
-            <div className="lg:col-span-6 flex flex-col items-start text-left lg:pl-8">
+            <div className="lg:col-span-6 flex flex-col items-start text-left lg:pl-10 max-w-lg lg:max-w-[480px]">
               <span className="px-2.5 py-1 rounded-full bg-[#230E2E] text-white text-[11px] font-mono mb-4">
                 02 · Effortless Daily Movement
               </span>
               <h3 className="text-[2.4rem] sm:text-[3.4rem] lg:text-[4.0rem] font-light tracking-tight leading-[1.08] text-[#14091F] mb-6">
                 Make lifting, walking, and climbing stairs smooth and easy again.
               </h3>
-              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed max-w-lg font-normal mb-6">
+              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed font-normal mb-6">
                 Rebuilding lean connective tissue so every stair step, grocery lift, and morning walk feels naturally light.
               </p>
               <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#8A7993]">
@@ -346,16 +352,19 @@ export default function ProductStorySections() {
         </div>
 
         {/* Benefit 03: Product Up / Centre-Right */}
-        <div className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80">
+        <div
+          id="story-benefit-3"
+          className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80"
+        >
           <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pointer-events-auto">
-            <div className="lg:col-span-6 flex flex-col items-start text-left">
+            <div className="lg:col-span-6 flex flex-col items-start text-left max-w-lg lg:max-w-[480px]">
               <span className="px-2.5 py-1 rounded-full bg-[#230E2E] text-white text-[11px] font-mono mb-4">
                 03 · Firm Muscle Tone
               </span>
               <h3 className="text-[2.4rem] sm:text-[3.4rem] lg:text-[4.0rem] font-light tracking-tight leading-[1.08] text-[#14091F] mb-6">
                 Wake up aging muscle cells and see real, firm definition return.
               </h3>
-              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed max-w-lg font-normal mb-6">
+              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed font-normal mb-6">
                 Overcoming anabolic resistance with high leucine density to stimulate true muscle protein synthesis day after day.
               </p>
               <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#8A7993]">
@@ -368,17 +377,20 @@ export default function ProductStorySections() {
         </div>
 
         {/* Benefit 04: Product Down / Centre-Left */}
-        <div className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80">
+        <div
+          id="story-benefit-4"
+          className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex items-center border-b border-[#EBE5DE]/80"
+        >
           <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pointer-events-auto">
             <div className="lg:col-span-6 h-[320px] pointer-events-none" />
-            <div className="lg:col-span-6 flex flex-col items-start text-left lg:pl-8">
+            <div className="lg:col-span-6 flex flex-col items-start text-left lg:pl-10 max-w-lg lg:max-w-[480px]">
               <span className="px-2.5 py-1 rounded-full bg-[#230E2E] text-white text-[11px] font-mono mb-4">
                 04 · Laser-Stable Metabolic Curve
               </span>
               <h3 className="text-[2.4rem] sm:text-[3.4rem] lg:text-[4.0rem] font-light tracking-tight leading-[1.08] text-[#14091F] mb-6">
                 Keep your energy laser-stable all afternoon long without the crash.
               </h3>
-              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed max-w-lg font-normal mb-6">
+              <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed font-normal mb-6">
                 Zero sugar spikes, zero rebound slumps. Clean fermented protein maintains steady metabolic flow when you need it most.
               </p>
               <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#8A7993]">
@@ -390,7 +402,10 @@ export default function ProductStorySections() {
         </div>
 
         {/* Benefit 05: Product Centre */}
-        <div className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex flex-col justify-center items-center text-center border-b border-[#EBE5DE]/80">
+        <div
+          id="story-benefit-5"
+          className="relative w-full min-h-[75vh] py-20 px-6 sm:px-12 lg:px-20 flex flex-col justify-center items-center text-center border-b border-[#EBE5DE]/80"
+        >
           <div className="relative z-20 w-full max-w-3xl mx-auto flex flex-col items-center pointer-events-auto">
             <span className="text-xs font-mono tracking-widest uppercase text-emerald-600 font-semibold mb-3">
               Benefit 05 · Structural Upright Frame
@@ -401,7 +416,7 @@ export default function ProductStorySections() {
             <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed max-w-xl mb-6 font-normal">
               The foundational architectural support that keeps your posture erect, confident, and steady through every decade.
             </p>
-            <div className="w-full h-[280px] pointer-events-none" />
+            <div className="w-full h-[240px] pointer-events-none" />
           </div>
         </div>
       </div>
@@ -431,7 +446,7 @@ export default function ProductStorySections() {
           </p>
 
           {/* Reserved 3D model center area */}
-          <div className="w-full h-[280px] sm:h-[340px] pointer-events-none" />
+          <div className="w-full h-[240px] sm:h-[300px] pointer-events-none" />
 
           <p className="text-[#5D5066] text-base sm:text-lg leading-relaxed max-w-md font-normal mb-8">
             10 grams of clean fermented yeast protein in a decadent, whole-nut crunch bar with zero added sugar.

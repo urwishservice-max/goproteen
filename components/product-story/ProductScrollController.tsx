@@ -1,8 +1,22 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { PersistentCanvasHandle } from './GoProteenPersistentCanvas';
-import { PRODUCT_POSES, POSE_KEYS, interpolatePoses } from './ProductScrollPoses';
+import { PRODUCT_POSES, interpolatePoses } from './ProductScrollPoses';
+
+const SECTION_WAYPOINTS = [
+  { id: 'story-hero', poseKey: 'hero' },
+  { id: 'story-problem', poseKey: 'problem' },
+  { id: 'story-breakthrough', poseKey: 'breakthrough' },
+  { id: 'story-protein-advantage', poseKey: 'proteinAdvantage' },
+  { id: 'story-stomach', poseKey: 'stomachComfort' },
+  { id: 'story-benefit-1', poseKey: 'benefit1' },
+  { id: 'story-benefit-2', poseKey: 'benefit2' },
+  { id: 'story-benefit-3', poseKey: 'benefit3' },
+  { id: 'story-benefit-4', poseKey: 'benefit4' },
+  { id: 'story-benefit-5', poseKey: 'benefit5' },
+  { id: 'story-finale', poseKey: 'finale' },
+];
 
 interface ProductScrollControllerProps {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -15,40 +29,56 @@ export default function ProductScrollController({
   canvasHandleRef,
   children,
 }: ProductScrollControllerProps) {
-  const isUpdatingRef = useRef(false);
-
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
     const handleScroll = () => {
-      if (!canvasHandleRef.current || !container) return;
+      if (!canvasHandleRef.current) return;
 
-      const rect = container.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
+      const vCenter = window.innerHeight * 0.5;
 
-      // Section total height minus one viewport
-      const totalScrollableDistance = rect.height - viewportHeight;
-      if (totalScrollableDistance <= 0) return;
+      // Collect current vertical center for all waypoints
+      const centers: { poseKey: string; center: number }[] = [];
+      for (let i = 0; i < SECTION_WAYPOINTS.length; i++) {
+        const el = document.getElementById(SECTION_WAYPOINTS[i].id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          centers.push({
+            poseKey: SECTION_WAYPOINTS[i].poseKey,
+            center: rect.top + rect.height * 0.5,
+          });
+        }
+      }
 
-      // Current distance scrolled inside the product-story container
-      const scrolled = -rect.top;
-      const progress = Math.max(0, Math.min(1, scrolled / totalScrollableDistance));
+      if (centers.length === 0) return;
 
-      // Map progress [0, 1] across the 11 poses
-      const totalPoses = POSE_KEYS.length;
-      const rawIndex = progress * (totalPoses - 1);
-      const baseIndex = Math.min(Math.floor(rawIndex), totalPoses - 2);
-      const fraction = rawIndex - baseIndex;
+      // If above the first section's center
+      if (vCenter <= centers[0].center) {
+        canvasHandleRef.current.setTargetPose(PRODUCT_POSES[centers[0].poseKey]);
+        return;
+      }
 
-      const p1Key = POSE_KEYS[baseIndex];
-      const p2Key = POSE_KEYS[baseIndex + 1];
+      // If below the last section's center
+      const last = centers[centers.length - 1];
+      if (vCenter >= last.center) {
+        canvasHandleRef.current.setTargetPose(PRODUCT_POSES[last.poseKey]);
+        return;
+      }
 
-      const p1 = PRODUCT_POSES[p1Key];
-      const p2 = PRODUCT_POSES[p2Key];
+      // Find the two sections that bracket the viewport center
+      for (let i = 0; i < centers.length - 1; i++) {
+        const c1 = centers[i].center;
+        const c2 = centers[i + 1].center;
 
-      const nextTargetPose = interpolatePoses(p1, p2, fraction);
-      canvasHandleRef.current.setTargetPose(nextTargetPose);
+        if (vCenter >= c1 && vCenter <= c2) {
+          const distance = c2 - c1;
+          const fraction = distance > 0 ? (vCenter - c1) / distance : 0;
+          const p1 = PRODUCT_POSES[centers[i].poseKey];
+          const p2 = PRODUCT_POSES[centers[i + 1].poseKey];
+
+          const targetPose = interpolatePoses(p1, p2, Math.max(0, Math.min(1, fraction)));
+          canvasHandleRef.current.setTargetPose(targetPose);
+          return;
+        }
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -59,7 +89,7 @@ export default function ProductScrollController({
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, [containerRef, canvasHandleRef]);
+  }, [canvasHandleRef]);
 
   return <>{children}</>;
 }

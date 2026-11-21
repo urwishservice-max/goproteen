@@ -70,7 +70,7 @@ export function createGoProteenProductModel(
     bumpMap,
     bumpScale: 1.2,
   });
-  const procCore = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.28, 0.6), chocMat);
+  const procCore = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.18, 0.4), chocMat);
   procGroup.add(procCore);
 
   const wCanvas = document.createElement('canvas');
@@ -96,7 +96,7 @@ export function createGoProteenProductModel(
     roughness: 0.28,
     metalness: 0.05,
   });
-  const procWrap = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.29, 0.62), wrapMat);
+  const procWrap = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.19, 0.42), wrapMat);
   procGroup.add(procWrap);
   rootGroup.add(procGroup);
 
@@ -127,7 +127,8 @@ export function createGoProteenProductModel(
         }
       });
 
-      const scaleFactor = 17.0;
+      // Refined scaleFactor to keep model sleek and prevent text collision
+      const scaleFactor = 10.5;
 
       if (wrapperMesh) {
         (wrapperMesh as THREE.Mesh).scale.setScalar(scaleFactor);

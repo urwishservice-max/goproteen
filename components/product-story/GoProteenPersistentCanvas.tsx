@@ -160,9 +160,13 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
         const idleRot = Math.sin(elapsed * 0.7) * 0.05;
         const idleFloat = Math.sin(elapsed * 1.4) * 0.04;
 
+        const w = container.clientWidth || 1280;
+        const xFactor = Math.min(1.0, Math.max(0.7, w / 1280));
+        const finalX = s.currentPose.x * xFactor;
+
         const root = modelHandle.rootGroup;
         root.position.set(
-          s.currentPose.x,
+          finalX,
           s.currentPose.y + idleFloat,
           s.currentPose.z
         );
