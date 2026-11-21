@@ -8,19 +8,16 @@ const BENEFITS_ROW_1 = [
     num: '01',
     title: 'Smooth Digestion',
     description: 'Every bite digests smoothly.',
-    tag: 'Digestive Ease',
   },
   {
     num: '02',
     title: 'Gut Comfort',
     description: 'Feel light, comfortable and free from bloating.',
-    tag: 'Anti-Bloat',
   },
   {
     num: '03',
     title: 'Blood Sugar Harmony',
     description: 'Support steady blood sugar after meals.',
-    tag: 'Metabolic Balance',
   },
 ];
 
@@ -29,19 +26,16 @@ const BENEFITS_ROW_2 = [
     num: '04',
     title: 'Sharp, Steady Focus',
     description: 'Maintain mental focus throughout the afternoon.',
-    tag: 'Gut-Brain Axis',
   },
   {
     num: '05',
     title: 'Natural Fullness',
     description: "Support your body's natural fullness hormones, GLP-1 and PYY.",
-    tag: 'Satiety Signaling',
   },
   {
     num: '06',
     title: 'Fewer Food Cravings',
     description: 'Help manage random, uncontrollable junk-food urges.',
-    tag: 'Appetite Control',
   },
 ];
 
@@ -229,9 +223,6 @@ export default function SynbioticAdvantageSection() {
                   <span className="text-sm text-[#5D5066] font-normal">
                     {b.description}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase tracking-wider">
-                    {b.tag}
-                  </span>
                 </div>
               ))}
             </div>
@@ -255,9 +246,6 @@ export default function SynbioticAdvantageSection() {
                   <span className="text-[#D8CFDC]">·</span>
                   <span className="text-sm text-[#5D5066] font-normal">
                     {b.description}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-mono uppercase tracking-wider">
-                    {b.tag}
                   </span>
                 </div>
               ))}
