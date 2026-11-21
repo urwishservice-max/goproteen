@@ -402,19 +402,10 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
 
         {/* Step 4: Bone Remodeling (Living Cellular Dynamics & Horizon) */}
         {activeStep === 3 && (
-          <div className="w-full space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/60 pb-3">
-              <div>
-                <h3 className="text-2xl font-light text-[#14091F]">
-                  Living Cellular Remodeling Dynamics
-                </h3>
-              </div>
-              <p className="text-xs text-stone-500 max-w-md italic">
-                “As you feel how important your frame really is… ask yourself: How strong and upright do you want to feel a decade from now?”
-              </p>
-            </div>
-            <BoneRemodeling onRestart={() => goToStep(0)} />
-          </div>
+          <BoneRemodeling
+            onRestart={() => goToStep(0)}
+            onPrev={() => goToStep(2)}
+          />
         )}
       </div>
 
