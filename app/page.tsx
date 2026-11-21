@@ -704,10 +704,16 @@ export default function GoProteenPage() {
         T.s = 0;
         T.op = 0;
         const cvEl = $('#c') as HTMLCanvasElement | null;
-        if (cvEl) cvEl.style.opacity = '0';
+        if (cvEl) {
+          cvEl.style.opacity = '0';
+          cvEl.style.visibility = 'hidden';
+        }
       } else {
         const cvEl = $('#c') as HTMLCanvasElement | null;
-        if (cvEl && s.id !== 'bone' && s.id !== 'crash') cvEl.style.opacity = '1';
+        if (cvEl && s.id !== 'bone' && s.id !== 'crash') {
+          cvEl.style.opacity = '1';
+          cvEl.style.visibility = 'visible';
+        }
         T.x = m ? 0 : k[0];
         T.y = m && k[5] < 0.5 ? k[1] * 0.5 : k[1];
         T.s = m ? k[2] * 0.8 : k[2];

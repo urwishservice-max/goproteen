@@ -14,26 +14,11 @@ export default function AfternoonCrashSection() {
   return (
     <section
       id="crash"
-      className="relative w-full min-h-[92vh] flex items-center justify-center px-6 sm:px-12 lg:px-20 py-16 lg:py-24 overflow-hidden"
+      className="relative w-full min-h-[90vh] flex items-center justify-center px-6 sm:px-12 lg:px-20 py-16 lg:py-24 overflow-hidden"
       style={{ backgroundColor: '#FDFBF7' }}
       data-bar="0 0 0 0 0 0 0 0"
       data-orb="0 0 0 0 0"
     >
-      {/* Background ambient radial glow matching the reference image */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          right: '5%',
-          top: '15%',
-          width: '720px',
-          height: '580px',
-          background:
-            'radial-gradient(circle at 60% 45%, rgba(244, 114, 182, 0.22) 0%, rgba(216, 180, 254, 0.18) 40%, rgba(253, 251, 247, 0) 72%)',
-          filter: 'blur(50px)',
-          zIndex: 0,
-        }}
-      />
-
       <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
         {/* Left Column: Heading, description, and interactive meal pill buttons */}
         <div className="lg:col-span-6 flex flex-col justify-center">
@@ -79,12 +64,40 @@ export default function AfternoonCrashSection() {
           </div>
         </div>
 
-        {/* Right Column: Sleeping man with floating low battery and dreamy ambient glow */}
+        {/* Right Column: Sleeping man (transparent cutout) with floating low battery directly above head */}
         <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end">
-          <div className="relative w-full max-w-[640px] select-none">
+          <div className="relative w-full max-w-[620px] select-none pt-12">
+            {/* Crisp Floating Battery Icon positioned directly above head */}
+            <div
+              className="absolute z-10 flex items-center select-none"
+              style={{
+                top: '0%',
+                left: '38%',
+              }}
+            >
+              {/* Battery Body Capsule */}
+              <div
+                className="relative w-[118px] h-[55px] rounded-[17px] border-[3.5px] border-[#230E2E] bg-white/95 p-[3.5px] flex items-center shadow-md shadow-[#230E2E]/10"
+              >
+                {/* Red Depleted Charge Level */}
+                <div
+                  className="h-full rounded-[10px] bg-gradient-to-r from-[#FF3B30] to-[#FF5E57] transition-all duration-500"
+                  style={{
+                    width: '22%',
+                    boxShadow: '0 0 10px rgba(255, 59, 48, 0.45)',
+                  }}
+                />
+              </div>
+              {/* Battery Terminal Knob */}
+              <div
+                className="w-[8px] h-[22px] bg-[#230E2E] rounded-r-[4px] ml-[-1px]"
+              />
+            </div>
+
+            {/* Man sleeping at desk (clean transparent background) */}
             <img
-              src="/images/afternoon_crash_man.png"
-              alt="Afternoon crash: sleeping at desk with low battery indicator"
+              src="/images/afternoon_crash_man_pure.png"
+              alt="The afternoon crash: exhausted at desk"
               className="w-full h-auto object-contain block pointer-events-none"
             />
           </div>
