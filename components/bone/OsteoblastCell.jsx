@@ -3,130 +3,95 @@
 import React, { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import { RoundedBox } from '@react-three/drei';
 
 /**
  * SingleOsteoblast
- * Individual plump, rounded/cuboidal bone builder cell with glowing central nucleus,
- * translucent pink/rose membrane, and active matrix synthesis.
+ * A single plump cuboidal bone-forming cell with rounded edges,
+ * vivid translucent bubblegum pink cytoplasm, and a prominent dark purple nucleus.
+ * Exact match to reference image media_1795256513892_8322cd90.jpg.
  */
-export function SingleOsteoblast({
+function SingleOsteoblast({
   position = [0, 0, 0],
-  scale = 0.45,
   activeMode = 'balanced',
-  seed = 0,
+  index = 0,
 }) {
   const meshRef = useRef(null);
 
-  // Plump rounded dome shape with organic micro-vesicles
-  const { cellGeom, vesicles } = useMemo(() => {
-    const geom = new THREE.SphereGeometry(1.0, 36, 36);
-    const pos = geom.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const v = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i));
-      // Dome flattening at base
-      if (v.y < 0) v.y *= 0.65;
-      const noise = Math.sin(v.x * 6.0 + seed) * 0.05 + Math.cos(v.z * 6.0 + seed) * 0.05;
-      v.multiplyScalar(1.0 + noise);
-      pos.setXYZ(i, v.x, v.y, v.z);
-    }
-    geom.computeVertexNormals();
-
-    // 4-6 Small secretory vesicles on top of the cell membrane
-    const vList = [];
-    for (let j = 0; j < 5; j++) {
-      const ang = (j / 5) * Math.PI * 2;
-      const r = 0.55 + (j % 2) * 0.2;
-      vList.push({
-        pos: [Math.cos(ang) * r, 0.45 + (j % 3) * 0.12, Math.sin(ang) * r],
-        radius: 0.12 + (j % 3) * 0.04,
-      });
-    }
-
-    return { cellGeom: geom, vesicles: vList };
-  }, [seed]);
-
   const isFormation = activeMode === 'formation';
   const isResorption = activeMode === 'resorption';
+  const emissiveFactor = isFormation ? 0.65 : isResorption ? 0.12 : 0.28;
 
-  const emissiveFactor = isFormation ? 0.75 : isResorption ? 0.12 : 0.32;
-
-  // Translucent vivid glossy rose/magenta cytoplasm membrane
+  // Glossy translucent bubblegum pink material
   const cellMaterial = useMemo(() => {
     return new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#FB7185'), // Vibrant rose pink
-      emissive: new THREE.Color('#BE185D'), // Deep magenta glow
+      color: new THREE.Color('#FF6584'), // Bubblegum rose pink
+      emissive: new THREE.Color('#BE185D'), // Magenta glow
       emissiveIntensity: emissiveFactor,
-      roughness: 0.18,
-      metalness: 0.04,
-      transmission: 0.4,
-      thickness: 0.55,
-      clearcoat: 0.85,
-      clearcoatRoughness: 0.12,
+      roughness: 0.16,
+      metalness: 0.02,
+      transmission: 0.35,
+      thickness: 0.5,
+      clearcoat: 0.92,
+      clearcoatRoughness: 0.08,
     });
   }, [emissiveFactor]);
 
-  const vesicleMaterial = useMemo(() => {
-    return new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#F43F5E'),
-      emissive: new THREE.Color('#9F1239'),
-      emissiveIntensity: 0.4,
-      roughness: 0.2,
-      clearcoat: 0.8,
-    });
-  }, []);
-
+  // Deep purple/magenta nucleus
   const nucleusMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#831843'), // Chromatin core
-      emissive: new THREE.Color('#500724'),
+      color: new THREE.Color('#701A75'), // Deep plum core
+      emissive: new THREE.Color('#4A044E'),
       emissiveIntensity: 0.45,
-      roughness: 0.2,
+      roughness: 0.22,
+      metalness: 0.05,
     });
   }, []);
 
   useFrame(() => {
     if (meshRef.current) {
-      const t = Date.now() * 0.002 + seed * 1.5;
-      meshRef.current.position.y = position[1] + Math.sin(t * 1.6) * 0.02;
+      const t = Date.now() * 0.002 + index * 0.8;
+      meshRef.current.position.y = position[1] + Math.sin(t * 1.5) * 0.012;
     }
   });
 
   return (
-    <group ref={meshRef} position={position} scale={[scale, scale, scale]}>
-      {/* Plump Translucent Cell Body */}
-      <mesh geometry={cellGeom} material={cellMaterial} castShadow receiveShadow />
+    <group ref={meshRef} position={position}>
+      {/* Plump Cuboidal Rounded Body */}
+      <RoundedBox
+        args={[0.58, 0.54, 0.54]}
+        radius={0.15}
+        smoothness={6}
+        castShadow
+        receiveShadow
+      >
+        <primitive object={cellMaterial} attach="material" />
+      </RoundedBox>
 
-      {/* Prominent Central Nucleus */}
-      <mesh position={[0, 0.12, 0]}>
-        <sphereGeometry args={[0.34, 16, 16]} />
+      {/* Embedded Front-Facing Spherical Nucleus */}
+      <mesh position={[0, 0.06, 0.21]}>
+        <sphereGeometry args={[0.11, 16, 16]} />
         <primitive object={nucleusMaterial} attach="material" />
       </mesh>
-
-      {/* Secretory Vesicles */}
-      {vesicles.map((v, idx) => (
-        <mesh key={idx} position={v.pos}>
-          <sphereGeometry args={[v.radius, 12, 12]} />
-          <primitive object={vesicleMaterial} attach="material" />
-        </mesh>
-      ))}
     </group>
   );
 }
 
+/**
+ * OsteoblastCell
+ * Renders the tidy row of 4 cuboidal osteoblasts along the right osteoid crest.
+ */
 export default function OsteoblastCell({
   activeMode = 'balanced',
   onClick = () => {},
 }) {
-  // Line of 5 osteoblasts resting on the right crest matching the mockup
-  const blasts = useMemo(() => {
-    return [
-      { id: 'ob-1', pos: [0.65, 0.42, 0.15], scale: 0.46, seed: 1 },
-      { id: 'ob-2', pos: [1.35, 0.50, 0.10], scale: 0.52, seed: 2 }, // Hero central osteoblast
-      { id: 'ob-3', pos: [2.05, 0.44, 0.20], scale: 0.44, seed: 3 },
-      { id: 'ob-4', pos: [2.75, 0.36, 0.25], scale: 0.38, seed: 4 },
-      { id: 'ob-5', pos: [3.35, 0.28, 0.15], scale: 0.34, seed: 5 },
-    ];
-  }, []);
+  // Exactly 4 cells side-by-side in a row matching the reference image
+  const cellPositions = useMemo(() => [
+    [0.42, 0.52, 0.05],
+    [1.08, 0.52, 0.05],
+    [1.74, 0.52, 0.05], // Cell 3 (pointer pin targets this cell)
+    [2.40, 0.52, 0.05],
+  ], []);
 
   return (
     <group
@@ -143,13 +108,12 @@ export default function OsteoblastCell({
         document.body.style.cursor = 'auto';
       }}
     >
-      {blasts.map((b) => (
+      {cellPositions.map((pos, idx) => (
         <SingleOsteoblast
-          key={b.id}
-          position={b.pos}
-          scale={b.scale}
+          key={idx}
+          position={pos}
           activeMode={activeMode}
-          seed={b.seed}
+          index={idx}
         />
       ))}
     </group>

@@ -4,8 +4,12 @@ import React from 'react';
 
 /**
  * BoneRemodelingControls
- * Editorial HUD, leader lines, 3-mode selector, right-panel narrative,
- * and infinity cycle diagram strictly matching the reference mockup.
+ * Exact layout match to reference image media_1795256513892_8322cd90.jpg:
+ * - Top Left: GoProteen logo, 04 / 07, Living Cellular Remodeling Dynamics
+ * - Top Center: Remodeling Cycle badge (circular gradient cycle arrows + Remove → Replace → Renew)
+ * - Top Right: Spoken quote with vertical plum accent bar
+ * - Right Panel: Bone Remodeling title, description, and interactive infinity turnover cycle diagram
+ * - Bottom Center: 3-mode selector (1. Balanced Remodeling, 2. Formation, 3. Resorption)
  */
 export default function BoneRemodelingControls({
   activeMode = 'balanced',
@@ -14,30 +18,29 @@ export default function BoneRemodelingControls({
 }) {
   const modeData = {
     balanced: {
-      title: 'Healthy Bone Turnover',
-      desc: 'In healthy youth, resorption and formation work at an identical pace, continuously renewing and strengthening the bone.',
+      title: 'Bone Remodeling',
+      desc: 'A continuous cycle where old bone is removed and new bone is built, keeping your bones strong and renewed.',
     },
     formation: {
       title: 'Bone Formation',
-      desc: 'Osteoblasts build new bone matrix, depositing a collagen-rich osteoid scaffold that progressively mineralizes into dense, durable bone.',
+      desc: 'Osteoblasts actively synthesize new collagenous osteoid matrix, which progressively mineralizes to reinforce bone density and structural resilience.',
     },
     resorption: {
       title: 'Bone Resorption',
-      desc: 'Osteoclasts attach to older bone tissue and release enzymes, breaking down mineral matrix to make room for renewal.',
+      desc: 'Osteoclasts seal tightly against damaged bone tissue and secrete acid and enzymes, excavating a precise pit to prepare the surface for renewal.',
     },
   };
 
   const currentInfo = modeData[activeMode] || modeData.balanced;
 
   return (
-    <>
+    <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 sm:p-6 lg:p-8 z-20">
       {/* ========================================================= */}
-      {/* TOP BAR: Header (Left) and Spoken Quote (Right) */}
+      {/* 1. TOP BAR: Left Header, Center Cycle Badge, Right Quote */}
       {/* ========================================================= */}
-      <div className="w-full flex flex-col md:flex-row md:items-start justify-between gap-4 z-20 pointer-events-auto">
-        {/* Top Left: Logo, 04 / 07, Title */}
+      <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pointer-events-auto">
+        {/* Top Left: Logo & Section Title */}
         <div className="space-y-1">
-          {/* Brand header */}
           <div className="flex flex-col items-start mb-0.5">
             <div className="w-6 h-[3px] bg-gradient-to-r from-orange-400 to-pink-500 rounded-full mb-1" />
             <span className="text-xs font-bold text-[#14091F] tracking-tight block">GoProteen</span>
@@ -69,8 +72,61 @@ export default function BoneRemodelingControls({
           </h2>
         </div>
 
+        {/* Top Center: Remodeling Cycle Badge (Matching reference image) */}
+        <div className="hidden md:flex flex-col items-center justify-center text-center px-4 self-center lg:self-start lg:pt-2">
+          {/* Circular gradient cycle arrows icon */}
+          <div className="relative w-10 h-10 mb-1 flex items-center justify-center">
+            <svg className="w-9 h-9" viewBox="0 0 36 36" fill="none">
+              <defs>
+                <linearGradient id="cycleGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#E02B78" />
+                  <stop offset="100%" stopColor="#A855F7" />
+                </linearGradient>
+                <linearGradient id="cycleGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#A855F7" />
+                  <stop offset="100%" stopColor="#F97316" />
+                </linearGradient>
+              </defs>
+              {/* Upper arc arrow */}
+              <path
+                d="M 18 5 A 13 13 0 0 1 31 18"
+                stroke="url(#cycleGrad1)"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 31 14 L 31 18 L 27 18"
+                stroke="url(#cycleGrad1)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Lower arc arrow */}
+              <path
+                d="M 18 31 A 13 13 0 0 1 5 18"
+                stroke="url(#cycleGrad2)"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 5 22 L 5 18 L 9 18"
+                stroke="url(#cycleGrad2)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h3 className="text-sm font-bold text-[#14091F] tracking-tight">
+            Remodeling Cycle
+          </h3>
+          <span className="text-[11px] text-stone-500 font-medium tracking-wide">
+            Remove &rarr; Replace &rarr; Renew
+          </span>
+        </div>
+
         {/* Top Right: Editorial Quote Block */}
-        <div className="border-l-[3px] border-[#831843] pl-3.5 py-1 max-w-md pt-2">
+        <div className="border-l-[3px] border-[#831843] pl-3.5 py-1 max-w-sm lg:max-w-xs self-start lg:pt-2">
           <p className="text-xs sm:text-[13px] text-stone-700 italic font-light leading-relaxed">
             “As you feel how important your frame really is… ask yourself: How strong and upright do you want to feel a decade from now?”
           </p>
@@ -78,187 +134,152 @@ export default function BoneRemodelingControls({
       </div>
 
       {/* ========================================================= */}
-      {/* 3D OVERLAYS: LEADER LINES TO CELLS */}
+      {/* 2. RIGHT PANEL: Bone Remodeling Info & Infinity Cycle */}
       {/* ========================================================= */}
-      {/* Osteoclast Leader Callout (Left) */}
-      <div
-        onClick={() => {
-          onSelectMode('resorption');
-          onSelectCell('osteoclast');
-        }}
-        className="absolute top-[28%] left-[20%] sm:left-[24%] z-30 pointer-events-auto cursor-pointer group flex flex-col items-start transition-transform hover:scale-105"
-      >
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-stone-200/90 shadow-xs">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#EA580C] shadow-2xs" />
-          <span className="text-xs font-bold text-[#14091F]">Osteoclasts</span>
-          <span className="text-[11px] text-stone-500 italic">Resorb old bone</span>
-        </div>
-        {/* Fine leader line pointing diagonally down to the osteoclast */}
-        <svg className="w-16 h-12 mt-1 overflow-visible" viewBox="0 0 64 48">
-          <path
-            d="M 12 0 L 22 18 L 30 42"
-            fill="none"
-            stroke="#14091F"
-            strokeWidth="1.1"
-            opacity="0.65"
-          />
-          <circle cx="30" cy="42" r="2.5" fill="#EA580C" />
-        </svg>
-      </div>
-
-      {/* Osteoblast Leader Callout (Right) */}
-      <div
-        onClick={() => {
-          onSelectMode('formation');
-          onSelectCell('osteoblast');
-        }}
-        className="absolute top-[25%] left-[54%] sm:left-[56%] z-30 pointer-events-auto cursor-pointer group flex flex-col items-start transition-transform hover:scale-105"
-      >
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-stone-200/90 shadow-xs">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#E02B78] shadow-2xs" />
-          <span className="text-xs font-bold text-[#14091F]">Osteoblasts</span>
-          <span className="text-[11px] text-stone-500 italic">Build new bone</span>
-        </div>
-        {/* Fine leader line pointing diagonally down to the osteoblasts */}
-        <svg className="w-16 h-12 mt-1 overflow-visible" viewBox="0 0 64 48">
-          <path
-            d="M 14 0 L 22 18 L 28 40"
-            fill="none"
-            stroke="#14091F"
-            strokeWidth="1.1"
-            opacity="0.65"
-          />
-          <circle cx="28" cy="40" r="2.5" fill="#E02B78" />
-        </svg>
-      </div>
-
-      {/* ========================================================= */}
-      {/* 3-MODE HORIZONTAL SELECTOR (Underneath Central 3D Model) */}
-      {/* ========================================================= */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center gap-6 sm:gap-10">
-        {/* Base connecting line */}
-        <div className="absolute top-[9px] left-3 right-3 h-[2px] bg-gradient-to-r from-purple-300 via-pink-300 to-orange-300 -z-0" />
-
-        {[
-          { id: 'balanced', label: '1. Balanced Remodeling' },
-          { id: 'formation', label: '2. Formation' },
-          { id: 'resorption', label: '3. Resorption' },
-        ].map((m) => {
-          const isActive = activeMode === m.id;
-
-          return (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => onSelectMode(m.id)}
-              className="relative flex flex-col items-center gap-1.5 z-10 cursor-pointer group focus:outline-none"
-            >
-              {/* Node Dot */}
-              <div className="w-5 h-5 flex items-center justify-center">
-                {isActive ? (
-                  <div className="w-5 h-5 rounded-full bg-[#231535] ring-4 ring-[#EADCF8] shadow-sm flex items-center justify-center scale-110">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                  </div>
-                ) : (
-                  <div className="w-4 h-4 rounded-full bg-white border-2 border-stone-300 group-hover:border-stone-500 transition-colors" />
-                )}
-              </div>
-
-              {/* Label */}
-              <span
-                className={`text-[11px] sm:text-xs font-mono tracking-wider transition-colors duration-200 whitespace-nowrap ${
-                  isActive ? 'font-bold text-[#14091F]' : 'text-stone-500 group-hover:text-[#14091F]'
-                }`}
-              >
-                {m.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ========================================================= */}
-      {/* RIGHT SIDE PANEL: Title, Description & Infinity Cycle */}
-      {/* ========================================================= */}
-      <div className="absolute top-28 right-4 sm:right-8 lg:right-12 z-20 pointer-events-auto max-w-[280px] sm:max-w-[320px] space-y-4">
-        {/* Heading with Deep Plum Bar */}
+      <div className="absolute right-4 sm:right-6 lg:right-8 top-[36%] -translate-y-1/2 w-64 sm:w-72 space-y-3 pointer-events-auto z-20">
         <div className="space-y-1.5">
-          <h3 className="text-lg sm:text-xl font-bold text-[#14091F] tracking-tight flex items-center gap-2">
-            <span className="w-1.5 h-5 bg-[#831843] rounded-full inline-block" />
-            <span>{currentInfo.title}</span>
-          </h3>
-          <p className="text-xs text-stone-600 font-light leading-relaxed pl-3.5">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-4 bg-[#E02B78] rounded-full" />
+            <h3 className="text-sm sm:text-base font-bold text-[#14091F] tracking-tight">
+              {currentInfo.title}
+            </h3>
+          </div>
+          <p className="text-xs text-stone-600 leading-relaxed font-light pl-3.5">
             {currentInfo.desc}
           </p>
         </div>
 
-        {/* Dynamic Infinity / Figure-8 Cycle Diagram strictly matching mockup */}
-        <div className="pt-2 pl-2">
-          <div className="relative w-[260px] h-[90px] flex items-center justify-center">
-            {/* SVG Infinity Loop Track with Directional Arrows */}
-            <svg
-              className="w-full h-full overflow-visible"
-              viewBox="0 0 260 90"
-              fill="none"
-            >
+        {/* Infinity Turnover Cycle Diagram (Matching reference image) */}
+        <div className="pt-2 pl-3.5">
+          <div className="relative w-full max-w-[240px] h-20">
+            {/* SVG Connecting Arrows */}
+            <svg className="w-full h-full overflow-visible" viewBox="0 0 240 80">
               <defs>
-                <linearGradient id="infinityGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#EA580C" />
-                  <stop offset="50%" stopColor="#FB7185" />
-                  <stop offset="100%" stopColor="#E02B78" />
-                </linearGradient>
+                <marker
+                  id="arrowRight"
+                  viewBox="0 0 10 10"
+                  refX="6"
+                  refY="5"
+                  markerWidth="5"
+                  markerHeight="5"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 1 L 8 5 L 0 9 z" fill="#8B5CF6" />
+                </marker>
+                <marker
+                  id="arrowLeft"
+                  viewBox="0 0 10 10"
+                  refX="6"
+                  refY="5"
+                  markerWidth="5"
+                  markerHeight="5"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 1 L 8 5 L 0 9 z" fill="#F97316" />
+                </marker>
               </defs>
 
-              {/* Elegant Smooth Infinity Curve */}
-              <path
-                d="M 65 45 C 65 15, 10 15, 10 45 C 10 75, 65 75, 130 45 C 195 15, 250 15, 250 45 C 250 75, 195 75, 130 45 C 100 30, 80 45, 65 45 Z"
-                stroke="url(#infinityGrad)"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                opacity="0.85"
+              {/* Left Orange Loop (Resorption) */}
+              <ellipse
+                cx="58"
+                cy="40"
+                rx="52"
+                ry="28"
+                fill="none"
+                stroke="#EA580C"
+                strokeWidth="2.2"
+                strokeDasharray={activeMode === 'resorption' ? 'none' : 'none'}
+                opacity={activeMode === 'formation' ? 0.45 : 1}
               />
 
-              {/* Directional Arrows */}
-              {/* Arrow on Left Orange Loop */}
-              <path
-                d="M 124 25 L 132 20 L 128 32"
-                stroke="#EA580C"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Arrow on Right Magenta Loop */}
-              <path
-                d="M 136 65 L 128 70 L 132 58"
+              {/* Right Pink Loop (Formation) */}
+              <ellipse
+                cx="182"
+                cy="40"
+                rx="52"
+                ry="28"
+                fill="none"
                 stroke="#E02B78"
-                strokeWidth="2"
+                strokeWidth="2.2"
+                opacity={activeMode === 'resorption' ? 0.45 : 1}
+              />
+
+              {/* Top Curved Arrow (Resorption -> Formation) */}
+              <path
+                d="M 98 22 C 112 14, 128 14, 142 22"
+                fill="none"
+                stroke="#8B5CF6"
+                strokeWidth="2.2"
                 strokeLinecap="round"
-                strokeLinejoin="round"
+                markerEnd="url(#arrowRight)"
+              />
+
+              {/* Bottom Curved Arrow (Formation -> Resorption) */}
+              <path
+                d="M 142 58 C 128 66, 112 66, 98 58"
+                fill="none"
+                stroke="#F97316"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                markerEnd="url(#arrowLeft)"
               />
             </svg>
 
-            {/* Left Loop Label: Resorption (Remove old bone) */}
-            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-center pointer-events-none">
-              <span className="text-[11px] font-bold text-[#C2410C] block leading-tight">
+            {/* Embedded Text inside Left & Right Loops */}
+            <div
+              onClick={() => onSelectMode('resorption')}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-24 flex flex-col items-center justify-center text-center cursor-pointer transition-transform hover:scale-105"
+            >
+              <span className="text-[11px] font-bold text-[#EA580C] leading-tight block">
                 Resorption
               </span>
-              <span className="text-[9.5px] text-stone-500 italic block leading-tight">
+              <span className="text-[9px] text-stone-500 italic font-light leading-tight block">
                 (Remove old bone)
               </span>
             </div>
 
-            {/* Right Loop Label: Formation (Build new bone) */}
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-center pointer-events-none">
-              <span className="text-[11px] font-bold text-[#BE185D] block leading-tight">
+            <div
+              onClick={() => onSelectMode('formation')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-24 flex flex-col items-center justify-center text-center cursor-pointer transition-transform hover:scale-105"
+            >
+              <span className="text-[11px] font-bold text-[#E02B78] leading-tight block">
                 Formation
               </span>
-              <span className="text-[9.5px] text-stone-500 italic block leading-tight">
+              <span className="text-[9px] text-stone-500 italic font-light leading-tight block">
                 (Build new bone)
               </span>
             </div>
           </div>
         </div>
       </div>
-    </>
+
+      {/* ========================================================= */}
+      {/* 3. BOTTOM CENTER: 3-Mode Selector Capsule */}
+      {/* ========================================================= */}
+      <div className="w-full flex items-center justify-center pb-2 pointer-events-auto z-30">
+        <div className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-stone-200/80 shadow-xs">
+          {[
+            { id: 'balanced', label: '1. Balanced Remodeling' },
+            { id: 'formation', label: '2. Formation' },
+            { id: 'resorption', label: '3. Resorption' },
+          ].map((mode) => {
+            const isActive = activeMode === mode.id;
+            return (
+              <button
+                key={mode.id}
+                onClick={() => onSelectMode(mode.id)}
+                className={`text-xs sm:text-[13px] font-medium px-4 py-1.5 rounded-full transition-all duration-300 select-none ${
+                  isActive
+                    ? 'bg-white text-[#14091F] font-bold shadow-xs border border-stone-200/90'
+                    : 'text-[#5D5066] hover:text-[#14091F] hover:bg-white/40'
+                }`}
+              >
+                {mode.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

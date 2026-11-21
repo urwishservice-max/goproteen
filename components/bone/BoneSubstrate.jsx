@@ -2,170 +2,224 @@
 
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
+import { RoundedBox } from '@react-three/drei';
 
 /**
  * BoneSubstrate
- * Volumetric anatomical living bone cutaway matching the reference mockup:
- * - Top surface: Natural undulating cortical surface with an excavated resorption bowl on the left
- *   and an osteoid-coated bone formation crest on the right.
- * - Front face: Rich fine-textured spongy trabecular bone lattice with numerous rounded marrow cavities.
+ * Exact match to reference image media_1795256513892_8322cd90.jpg:
+ * - Volumetric anatomical bone block with rounded beveled corners
+ * - Left concave resorption pit excavated where osteoclast sits
+ * - Right vibrant pink collagenous osteoid bed where 4 osteoblasts sit
+ * - Clean staggered rows of smooth circular/oval trabecular marrow pores
+ *   carved into the front cutaway face with warm shadowed marrow cavities
  */
 export default function BoneSubstrate({
-  resorptionDepth = 0.65,
-  formationHeight = 0.42,
+  resorptionDepth = 0.58,
+  formationHeight = 0.38,
   activeMode = 'balanced',
 }) {
-  const { topGeom, frontGeom, pores } = useMemo(() => {
-    const width = 11.0;
-    const depth = 4.2;
+  const { topSurfaceGeom, osteoidGeom, pores } = useMemo(() => {
+    // 1. Top cortical surface with excavated left pit and right formation bed
+    const width = 9.4;
+    const depth = 2.96;
     const segW = 90;
-    const segD = 42;
+    const segD = 40;
 
-    const getElevation = (x, z) => {
-      let y = Math.sin(x * 0.4) * 0.22 + Math.cos(z * 0.6) * 0.12;
+    const topGeom = new THREE.PlaneGeometry(width, depth, segW, segD);
+    topGeom.rotateX(-Math.PI / 2);
 
-      // Concave Resorption Pit on the left (x = -2.1, z = 0.2)
-      const dxResorb = x - (-2.1);
-      const dzResorb = z - 0.2;
+    const pos = topGeom.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+
+      let y = 0.74; // Baseline top surface
+
+      // Left Concave Resorption Pit (centered around x = -2.35, z = 0.05)
+      const dxResorb = x - (-2.35);
+      const dzResorb = z - 0.05;
       const distResorb = Math.sqrt(dxResorb * dxResorb + dzResorb * dzResorb);
-      if (distResorb < 1.85) {
-        const factor = Math.cos((distResorb / 1.85) * (Math.PI / 2));
-        y -= factor * factor * (resorptionDepth * 1.55);
+      if (distResorb < 1.48) {
+        const factor = Math.cos((distResorb / 1.48) * (Math.PI / 2));
+        y -= factor * factor * (resorptionDepth * 0.98);
       }
 
-      // Convex Formation Crest on the right (x = 1.9, z = 0.2)
-      const dxForm = x - 1.9;
-      const dzForm = z - 0.2;
+      // Right Formation Crest (x = 1.45, z = 0.05)
+      const dxForm = x - 1.45;
+      const dzForm = z - 0.05;
       const distForm = Math.sqrt(dxForm * dxForm + dzForm * dzForm);
-      if (distForm < 2.5) {
-        const factor = Math.cos((distForm / 2.5) * (Math.PI / 2));
-        y += factor * factor * (formationHeight * 1.3);
+      if (distForm < 1.85) {
+        const factor = Math.cos((distForm / 1.85) * (Math.PI / 2));
+        y += factor * factor * (formationHeight * 0.18);
       }
 
-      y += (Math.sin(x * 6.0) * Math.cos(z * 6.0)) * 0.035;
-      return y;
-    };
+      // Very subtle organic surface micro-texture
+      y += (Math.sin(x * 5.0) * Math.cos(z * 5.0)) * 0.008;
 
-    // 1. Top Cortical Bone Surface
-    const top = new THREE.PlaneGeometry(width, depth, segW, segD);
-    top.rotateX(-Math.PI / 2);
-    const topPos = top.attributes.position;
-    for (let i = 0; i < topPos.count; i++) {
-      const x = topPos.getX(i);
-      const z = topPos.getZ(i);
-      topPos.setY(i, getElevation(x, z));
+      pos.setY(i, y);
     }
-    top.computeVertexNormals();
+    topGeom.computeVertexNormals();
 
-    // 2. Organic Front Cutaway Face
-    const frontSegY = 32;
-    const front = new THREE.PlaneGeometry(width, 1.8, segW, frontSegY);
-    const frontPos = front.attributes.position;
-    for (let i = 0; i < frontPos.count; i++) {
-      const x = frontPos.getX(i);
-      const origY = frontPos.getY(i);
-      const v = (origY + 0.9) / 1.8; // 0 at bottom, 1 at top
-
-      const topY = getElevation(x, 1.95);
-      const bottomY = -1.35;
-
-      const y = bottomY + v * (topY - bottomY);
-      const z = 1.95 + Math.sin(v * Math.PI) * 0.12 + (Math.sin(x * 4.0) * 0.04);
-
-      frontPos.setY(i, y);
-      frontPos.setZ(i, z);
+    // 2. Vibrant pink osteoid bed surface covering the right top area
+    const ostW = 3.3;
+    const ostD = 2.1;
+    const ostGeom = new THREE.PlaneGeometry(ostW, ostD, 32, 20);
+    ostGeom.rotateX(-Math.PI / 2);
+    const ostPos = ostGeom.attributes.position;
+    for (let i = 0; i < ostPos.count; i++) {
+      const ox = ostPos.getX(i);
+      const oz = ostPos.getZ(i);
+      const falloff =
+        Math.cos((ox / (ostW / 2)) * (Math.PI / 2)) *
+        Math.cos((oz / (ostD / 2)) * (Math.PI / 2));
+      const oy = 0.745 + Math.max(0, falloff) * 0.04;
+      ostPos.setY(i, oy);
     }
-    front.computeVertexNormals();
+    ostGeom.computeVertexNormals();
 
-    // 3. Dense, fine-scale spongy trabecular honeycomb pores matching reference
+    // 3. Staggered organic trabecular pores across the front cutaway wall
+    // 2 neat horizontal rows matching media_1795256513892_8322cd90.jpg
     const poreList = [];
-    const cols = 28;
-    const rows = 5;
+    const cols = 8;
     for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < rows; r++) {
-        const u = c / (cols - 1);
-        const v = r / (rows - 1);
+      const u = c / (cols - 1);
 
-        const px = -4.8 + u * 9.6 + Math.sin(r * 4.2 + c * 2.1) * 0.12;
-        const topYAtX = getElevation(px, 1.95);
-        const py = topYAtX - 0.32 - v * 0.85 + Math.cos(c * 3.7 + r) * 0.06;
-        const pz = 2.02 + Math.sin((1 - v) * Math.PI) * 0.08;
+      // Top row of pores
+      const x1 = -3.8 + u * 7.6 + (c % 2 === 0 ? 0.05 : -0.05);
+      const y1 = 0.22 + ((c * 2) % 3) * 0.03;
+      const r1 = 0.22 + ((c * 3) % 4) * 0.035;
 
-        // Tighter, fine-scale pore radii
-        const radius = 0.085 + ((c * 4 + r * 9) % 6) * 0.025;
+      poreList.push({
+        id: `pore-row1-${c}`,
+        pos: [x1, y1, 1.49],
+        scale: [r1 * 1.1, r1 * 0.95, 0.22],
+        rotZ: (c % 2 === 0 ? 1 : -1) * 0.1,
+      });
+
+      // Bottom staggered row of pores
+      if (c < cols - 1) {
+        const x2 = -3.3 + u * 7.6;
+        const y2 = -0.32 + ((c * 3) % 3) * 0.03;
+        const r2 = 0.24 + ((c * 2) % 3) * 0.03;
 
         poreList.push({
-          id: `pore-${c}-${r}`,
-          pos: [px, py, pz],
-          scale: [radius, radius * 0.92, radius * 0.28],
-          rotZ: Math.sin(c + r * 2) * 0.7,
+          id: `pore-row2-${c}`,
+          pos: [x2, y2, 1.49],
+          scale: [r2 * 1.05, r2 * 0.95, 0.22],
+          rotZ: (c % 2 === 0 ? -1 : 1) * 0.1,
         });
       }
     }
 
-    return { topGeom: top, frontGeom: front, pores: poreList };
+    return { topSurfaceGeom: topGeom, osteoidGeom: ostGeom, pores: poreList };
   }, [resorptionDepth, formationHeight]);
 
-  // Warm ivory & porous marrow materials
-  const boneMaterial = useMemo(() => {
+  // Warm ivory cortical bone materials matching reference photo
+  const boneSurfaceMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#FAF3EB'),
+      color: new THREE.Color('#FAF5EE'), // Smooth warm ivory cortical surface
       roughness: 0.35,
-      metalness: 0.03,
-      flatShading: false,
-    });
-  }, []);
-
-  const frontCutawayMaterial = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#EFE1D2'),
-      roughness: 0.48,
       metalness: 0.02,
-      flatShading: false,
     });
   }, []);
 
-  const poreRimMaterial = useMemo(() => {
+  const boneWallMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#E2CCA8'), // Golden-cream cavity rim
-      roughness: 0.4,
-      metalness: 0.04,
+      color: new THREE.Color('#F6ECE1'), // Warm cream bone block body
+      roughness: 0.40,
+      metalness: 0.02,
     });
   }, []);
 
-  const poreVoidMaterial = useMemo(() => {
+  const osteoidBedMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#A87B65'), // Warm marrow cavity depth
-      roughness: 0.75,
+      color: new THREE.Color('#FF7B95'), // Vibrant pink glazed osteoid
+      emissive: new THREE.Color('#BE185D'),
+      emissiveIntensity: activeMode === 'formation' ? 0.45 : 0.22,
+      roughness: 0.35,
+      metalness: 0.02,
+      transparent: true,
+      opacity: 0.88,
+    });
+  }, [activeMode]);
+
+  // Deep warm shadowed cavity material for pore interiors
+  const poreInteriorMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#B48B69'), // Warm shadowed marrow interior
+      roughness: 0.72,
+      metalness: 0.02,
     });
   }, []);
 
-  const torusGeom = useMemo(() => new THREE.TorusGeometry(1, 0.24, 12, 20), []);
-  const sphereGeom = useMemo(() => new THREE.SphereGeometry(1, 14, 10), []);
+  // Subtle natural pore rim material
+  const poreRimMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#EFE4D6'), // Smooth beveled bone pore rim
+      roughness: 0.38,
+      metalness: 0.02,
+    });
+  }, []);
+
+  const cavityGeom = useMemo(() => new THREE.SphereGeometry(1, 16, 12), []);
+  const rimGeom = useMemo(() => new THREE.TorusGeometry(1, 0.12, 12, 24), []);
 
   return (
-    <group name="LivingBoneMicroenvironmentSubstrate">
-      {/* 1. Undulating Cortical Bone Surface */}
-      <mesh geometry={topGeom} material={boneMaterial} receiveShadow castShadow />
+    <group name="AnatomicalBoneSegment" position={[0, -0.25, 0]}>
+      {/* 1. Volumetric Bone Block with Rounded Beveled Corners */}
+      <RoundedBox
+        args={[9.4, 1.48, 2.95]}
+        radius={0.16}
+        smoothness={6}
+        position={[0, -0.05, 0]}
+        receiveShadow
+        castShadow
+      >
+        <primitive object={boneWallMat} attach="material" />
+      </RoundedBox>
 
-      {/* 2. Organic Undulating Front Cutaway Wall */}
-      <mesh geometry={frontGeom} material={frontCutawayMaterial} receiveShadow />
+      {/* 2. Top Cortical Bone Surface with Excavated Resorption Pit */}
+      <mesh geometry={topSurfaceGeom} material={boneSurfaceMat} receiveShadow castShadow />
 
-      {/* 3. Spongy Trabecular Cavities */}
-      <group name="TrabecularMarrowCavities">
+      {/* 3. Pink Collagenous Osteoid Bed on Right */}
+      <mesh
+        geometry={osteoidGeom}
+        material={osteoidBedMat}
+        position={[1.45, 0.01, 0.05]}
+        receiveShadow
+      />
+
+      {/* 4. Smooth Organic Trabecular Marrow Pores on Front Wall */}
+      <group name="FrontTrabecularPores">
         {pores.map((p) => (
           <group key={p.id} position={p.pos} rotation={[0, 0, p.rotZ]}>
             {/* Deep inner cavity shadow */}
-            <mesh position={[0, 0, -0.05]} scale={p.scale}>
-              <primitive object={sphereGeom} attach="geometry" />
-              <primitive object={poreVoidMaterial} attach="material" />
+            <mesh position={[0, 0, -0.08]} scale={p.scale}>
+              <primitive object={cavityGeom} attach="geometry" />
+              <primitive object={poreInteriorMat} attach="material" />
             </mesh>
-            {/* Rounded organic pore rim */}
+            {/* Smooth beveled organic rim */}
             <mesh scale={p.scale}>
-              <primitive object={torusGeom} attach="geometry" />
-              <primitive object={poreRimMaterial} attach="material" />
+              <primitive object={rimGeom} attach="geometry" />
+              <primitive object={poreRimMat} attach="material" />
             </mesh>
           </group>
+        ))}
+      </group>
+
+      {/* 5. Calcium Mineral Fragments in Resorption Pit */}
+      <group position={[-2.35, 0.32, 0.05]}>
+        {[
+          { pos: [-0.28, 0, -0.15], s: 0.065 },
+          { pos: [0.12, 0.02, 0.22], s: 0.08 },
+          { pos: [-0.06, -0.01, 0.30], s: 0.06 },
+          { pos: [0.30, 0.02, -0.06], s: 0.075 },
+          { pos: [-0.22, 0.01, 0.19], s: 0.065 },
+        ].map((c, idx) => (
+          <mesh key={idx} position={c.pos} scale={[c.s, c.s * 0.8, c.s]}>
+            <octahedronGeometry args={[1, 0]} />
+            <meshStandardMaterial color="#FFFBEB" roughness={0.25} metalness={0.08} />
+          </mesh>
         ))}
       </group>
     </group>
