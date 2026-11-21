@@ -44,6 +44,7 @@ const BoneFoundationExperience = dynamic(() => import('../components/bone/BoneFo
 
 import AfternoonCrashSection from '../components/sections/AfternoonCrashSection';
 import SynbioticAdvantageSection from '../components/sections/SynbioticAdvantageSection';
+import CleanLabelGuaranteeSection from '../components/sections/CleanLabelGuaranteeSection';
 
 const ProductStoryFlow = dynamic(
   () => import('../components/product-story'),
@@ -1954,6 +1955,10 @@ export default function GoProteenPage() {
             </div>
           </details>
         </section>
+        <div className="sp"></div>
+
+        {/* The Clean-Label Guarantee / Scene 8: Reading The Fine Print */}
+        <CleanLabelGuaranteeSection />
         <div className="sp"></div>
 
         {/* Section 6: Breakthrough Solution */}
