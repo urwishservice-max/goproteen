@@ -74,11 +74,13 @@ export default function CleanLabelGuaranteeSection() {
   return (
     <section
       id="clean-label-guarantee"
-      className="relative z-20 w-full py-24 sm:py-32 px-6 sm:px-12 lg:px-20 bg-[#FDFBF7] text-[#14091F] overflow-hidden border-t border-b border-[#EBE5DE]/80"
+      data-bar="0 -0.07 1.15 0 0.12 1 1 0"
+      data-orb="0 -0.05 1.25 320 0.55"
+      className="relative z-10 w-full pt-28 pb-24 sm:pt-36 sm:pb-32 px-6 sm:px-12 lg:px-20 bg-transparent text-[#14091F] overflow-hidden"
     >
       {/* Background Soft Glows */}
       <div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[750px] h-[600px] rounded-full pointer-events-none opacity-25 blur-[150px]"
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[750px] h-[600px] rounded-full pointer-events-none opacity-20 blur-[150px]"
         style={{
           background:
             'radial-gradient(circle, rgba(236,72,153,0.18) 0%, rgba(168,85,247,0.15) 50%, rgba(253,251,247,0) 80%)',
@@ -89,7 +91,7 @@ export default function CleanLabelGuaranteeSection() {
         {/* Top Header Bar */}
         <div className="w-full flex items-center justify-between mb-12 sm:mb-16">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono tracking-widest uppercase text-[#8A7993]">
+            <span className="mono text-xs font-mono tracking-widest uppercase text-[#8A7993]">
               SCENE 8: READING THE FINE PRINT
             </span>
             <span className="text-[#D8CFDC]">/</span>
@@ -113,7 +115,7 @@ export default function CleanLabelGuaranteeSection() {
         </div>
 
         {/* Section Headline */}
-        <div className="max-w-3xl mb-12 sm:mb-16">
+        <div className="max-w-3xl mb-8 sm:mb-12">
           <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] mb-4 block">
             The Clean-Label Guarantee
           </span>
@@ -129,22 +131,40 @@ export default function CleanLabelGuaranteeSection() {
           </h2>
         </div>
 
-        {/* Editorial Narrative Split: The Reality vs. The Purity */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pb-14 border-b border-[#EBE5DE]/80">
-          <div className="lg:col-span-6 text-left">
-            <p className="text-lg sm:text-xl text-[#5D5066] font-light leading-relaxed mb-4">
+        {/* Editorial Narrative Split: The Reality vs. 3D Model Center Stage vs. The Purity */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 pb-20 border-b border-[#EBE5DE]/80">
+          <div className="lg:col-span-4 text-left flex flex-col justify-center">
+            <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A7993] mb-3 block">
+              The Commercial Reality
+            </span>
+            <p className="text-base sm:text-lg text-[#5D5066] font-light leading-relaxed">
               “When you pick up a commercial ‘health’ or ‘protein’ bar... turn it over in your hand... and discover a long list of artificial sugars, palm oils, synthetic fillers, and dairy isolates hidden behind flashy marketing claims.”
             </p>
           </div>
 
-          <div className="lg:col-span-6 text-left lg:pl-6 flex flex-col justify-center">
+          {/* Center Stage: Dedicated empty space for the persistent 3D product model */}
+          <div className="lg:col-span-4 min-h-[300px] sm:min-h-[360px] flex items-center justify-center pointer-events-none relative">
+            {/* Subtle soft aura glow accentuating the 3D bar */}
+            <div
+              className="w-56 h-56 rounded-full pointer-events-none opacity-40 blur-2xl"
+              style={{
+                background:
+                  'radial-gradient(circle, rgba(147,51,234,0.22) 0%, rgba(225,29,72,0.15) 50%, transparent 75%)',
+              }}
+            />
+          </div>
+
+          <div className="lg:col-span-4 text-left lg:pl-4 flex flex-col justify-center">
+            <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A7993] mb-3 block">
+              The GoProteen Promise
+            </span>
             <p className="text-xl sm:text-2xl text-[#14091F] font-normal leading-relaxed">
               You can feel complete peace of mind knowing we believe in{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9333EA] to-[#E11D48] font-medium">
                 total purity.
               </span>
             </p>
-            <span className="text-xs font-mono tracking-widest uppercase text-[#8A7993] mt-4">
+            <span className="text-xs font-mono tracking-widest uppercase text-[#8A7993] mt-3">
               Transparent Formulations · Zero Compromises
             </span>
           </div>
@@ -177,7 +197,11 @@ export default function CleanLabelGuaranteeSection() {
         </div>
 
         {/* MAX-BIOAVAILABLE PROTEIN MATRIX */}
-        <div className="pt-14 sm:pt-20">
+        <div
+          data-bar="1.3 0.6 0.42 0.3 0 0.25 1 0"
+          data-orb="1 0 .8 300 .45"
+          className="pt-14 sm:pt-20"
+        >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
               <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] block mb-2">
