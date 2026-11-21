@@ -42,6 +42,10 @@ const BoneFoundationExperience = dynamic(() => import('../components/bone/BoneFo
   ),
 });
 
+const AfternoonCrashSection = dynamic(() => import('../components/sections/AfternoonCrashSection'), {
+  ssr: false,
+});
+
 export default function GoProteenPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const armContainerRef = useRef<HTMLDivElement>(null);
@@ -694,7 +698,7 @@ export default function GoProteenPage() {
         $$('.anat button').forEach((x) => x.classList.remove('on'));
       }
 
-      if (s.id === 'bone') {
+      if (s.id === 'bone' || s.id === 'crash') {
         T.x = 0;
         T.y = 0;
         T.s = 0;
@@ -702,6 +706,8 @@ export default function GoProteenPage() {
         const cvEl = $('#c') as HTMLCanvasElement | null;
         if (cvEl) cvEl.style.opacity = '0';
       } else {
+        const cvEl = $('#c') as HTMLCanvasElement | null;
+        if (cvEl && s.id !== 'bone' && s.id !== 'crash') cvEl.style.opacity = '1';
         T.x = m ? 0 : k[0];
         T.y = m && k[5] < 0.5 ? k[1] * 0.5 : k[1];
         T.s = m ? k[2] * 0.8 : k[2];
@@ -1858,61 +1864,18 @@ export default function GoProteenPage() {
         <div className="sp"></div>
 
         {/* Section 4: Midday afternoon crash */}
-        <section
-          id="crash"
-          data-bar="1.25 .7 .4 .4 0 .25 0 0"
-          data-orb="-1 0 .7 300 .5"
-        >
-          <span className="mono r">Midday</span>
-          <h2 className="r">The afternoon crash.</h2>
-          <p className="r">
-            Carb-heavy lunches can mean a quick spike, then a slump. Pick a meal and watch the energy curve.
-          </p>
-          <div className="chips r" id="chips">
-            <button className="on" data-m="0">
-              Rice + roti
-            </button>
-            <button data-m="1">Tea + biscuit</button>
-            <button data-m="2">With GoProteen</button>
+        <AfternoonCrashSection />
+        <details className="story" style={{ display: 'none' }}>
+          <summary>Read the full story · The silent 10-gram deficit &amp; afternoon crash</summary>
+          <div>
+            <p>
+              “Think about what happens when you finish your midday meal… rice, rotis, or heavy carbs. An hour later, your stomach feels completely full… heavy… and weighed down. And as that full feeling sets in, your mind grows foggy… your focus drifts… and your energy crashes. You find yourself reaching blindly for tea, coffee, or sugary snacks… desperately trying to scrape together enough focus… just to make it through the rest of the day.
+            </p>
+            <p>
+              Carbohydrate-heavy meals trigger rapid blood sugar spikes… followed by steep, exhausting crashes… leaving your cells stranded in a hidden daily deficit of 10 grams of clean cellular protein. Look back at what you ate today… How much of it was fast-burning carbs… and how much was pure, high-quality cellular repair fuel?”
+            </p>
           </div>
-          <svg className="cv r" viewBox="0 0 520 160" aria-label="Illustrative energy curve">
-            <line x1="0" y1="150" x2="520" y2="150" stroke="currentColor" opacity=".2" />
-            <path
-              id="curve"
-              d="M0 110 C90 110 110 30 180 30 S260 140 340 140 S430 110 520 110"
-              fill="none"
-              stroke="url(#g)"
-              strokeWidth="3"
-              strokeLinecap="round"
-              style={{ transition: 'd .9s' }}
-            />
-            <defs>
-              <linearGradient id="g">
-                <stop offset="0" stopColor="#FF8A2B" />
-                <stop offset="1" stopColor="#5B21B6" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <span className="mono">Illustrative only</span>
-          <div className="gap r" id="gap">
-            <i className="a"></i>
-            <i className="b"></i>
-          </div>
-          <p className="mono" id="gapl">
-            The silent 10 g deficit
-          </p>
-          <details className="story">
-            <summary>Read the full story · The silent 10-gram deficit &amp; afternoon crash</summary>
-            <div>
-              <p>
-                “Think about what happens when you finish your midday meal… rice, rotis, or heavy carbs. An hour later, your stomach feels completely full… heavy… and weighed down. And as that full feeling sets in, your mind grows foggy… your focus drifts… and your energy crashes. You find yourself reaching blindly for tea, coffee, or sugary snacks… desperately trying to scrape together enough focus… just to make it through the rest of the day.
-              </p>
-              <p>
-                Carbohydrate-heavy meals trigger rapid blood sugar spikes… followed by steep, exhausting crashes… leaving your cells stranded in a hidden daily deficit of 10 grams of clean cellular protein. Look back at what you ate today… How much of it was fast-burning carbs… and how much was pure, high-quality cellular repair fuel?”
-              </p>
-            </div>
-          </details>
-        </section>
+        </details>
         <div className="sp"></div>
 
         {/* Section 5: The repair kit */}

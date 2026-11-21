@@ -2,112 +2,94 @@
 
 import React, { useState } from 'react';
 
-const MEAL_PATHS = [
-  // 0: Rice + roti: quick peak, sharp crash
-  "M0 110 C90 110 110 30 180 30 S260 140 340 140 S430 110 520 110",
-  // 1: Tea + biscuit: sudden steep spike, drastic deep slump
-  "M0 110 C60 110 90 10 150 20 S230 150 330 148 S440 120 520 118",
-  // 2: With GoProteen: smooth, balanced, steady sustained curve
-  "M0 100 C130 90 200 70 260 74 S400 90 520 84",
+const MEALS = [
+  { id: 'rice', label: 'Rice + roti' },
+  { id: 'tea', label: 'Tea + biscuit' },
+  { id: 'goproteen', label: 'With GoProteen' },
 ];
 
 export default function AfternoonCrashSection() {
-  const [activeMeal, setActiveMeal] = useState(0);
+  const [activeMealId, setActiveMealId] = useState<string>('goproteen');
 
   return (
     <section
-      className="min-h-screen px-[8vw] py-[20vh] flex flex-col justify-center relative"
-      data-bar="1.25 0.7 0.4 0.4 0 0.25 0 0"
-      data-orb="-1 0 0.7 300 0.5"
+      id="crash"
+      className="relative w-full min-h-[92vh] flex items-center justify-center px-6 sm:px-12 lg:px-20 py-16 lg:py-24 overflow-hidden"
+      style={{ backgroundColor: '#FDFBF7' }}
+      data-bar="0 0 0 0 0 0 0 0"
+      data-orb="0 0 0 0 0"
     >
-      <span className="mono mb-2">Midday</span>
+      {/* Background ambient radial glow matching the reference image */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          right: '5%',
+          top: '15%',
+          width: '720px',
+          height: '580px',
+          background:
+            'radial-gradient(circle at 60% 45%, rgba(244, 114, 182, 0.22) 0%, rgba(216, 180, 254, 0.18) 40%, rgba(253, 251, 247, 0) 72%)',
+          filter: 'blur(50px)',
+          zIndex: 0,
+        }}
+      />
 
-      <h2 className="text-[clamp(2.4rem,6.5vw,5.5rem)] font-extralight tracking-tight leading-[0.95] max-w-[13ch] my-4 text-fg">
-        The afternoon crash.
-      </h2>
-
-      <p className="max-w-[48ch] text-mut mb-6">
-        Carb-heavy lunches can mean a quick spike, then a slump. Pick a meal and watch the energy curve.
-      </p>
-
-      {/* Meal Selection Chips */}
-      <div className="flex flex-wrap gap-2.5 my-4">
-        {[
-          { id: 0, label: 'Rice + roti' },
-          { id: 1, label: 'Tea + biscuit' },
-          { id: 2, label: 'With GoProteen' },
-        ].map((chip) => (
-          <button
-            key={chip.id}
-            onClick={() => setActiveMeal(chip.id)}
-            className={`pill cursor-pointer transition-all duration-300 ${
-              activeMeal === chip.id
-                ? 'bg-fg text-bg border-fg shadow-lg scale-105'
-                : 'hover:border-fg/40'
-            }`}
+      <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+        {/* Left Column: Heading, description, and interactive meal pill buttons */}
+        <div className="lg:col-span-6 flex flex-col justify-center">
+          <h2
+            className="text-[2.8rem] sm:text-[3.8rem] md:text-[4.4rem] lg:text-[4.8rem] font-light tracking-tight leading-[1.04] text-[#14091F] mb-6 select-none"
+            style={{
+              fontFamily:
+                '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              letterSpacing: '-0.025em',
+            }}
           >
-            {chip.label}
-          </button>
-        ))}
-      </div>
+            <span>The afternoon</span>
+            <br />
+            <span>crash.</span>
+          </h2>
 
-      {/* Dynamic SVG Energy Curve */}
-      <div className="max-w-[560px] my-6">
-        <svg
-          viewBox="0 0 520 160"
-          className="w-full h-auto overflow-visible"
-          aria-label="Illustrative blood sugar energy curve"
-        >
-          <line x1="0" y1="150" x2="520" y2="150" stroke="currentColor" opacity="0.2" />
-          <path
-            d={MEAL_PATHS[activeMeal]}
-            fill="none"
-            stroke="url(#energyGradient)"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            className="transition-all duration-700 ease-out"
-          />
-          <defs>
-            <linearGradient id="energyGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#FF8A2B" />
-              <stop offset="100%" stopColor="#5B21B6" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <span className="mono block mt-2 text-[10px]">Illustrative only</span>
-      </div>
+          <p className="text-[#5D5066] text-base sm:text-[17px] leading-[1.58] max-w-[440px] mb-8 font-normal">
+            Carb-heavy lunches can mean a quick spike, then a slump. Pick a meal and watch the energy curve.
+          </p>
 
-      {/* Silent 10g deficit indicator */}
-      <div className="max-w-md my-4">
-        <div className="h-2 w-full bg-fg/10 rounded-full overflow-hidden flex">
-          <div
-            className={`h-full transition-all duration-500 ${
-              activeMeal === 2 ? 'w-full bg-emerald-500' : 'w-[25%] bg-amber-500'
-            }`}
-          />
+          {/* Meal Selection Pill Buttons in a single horizontal row */}
+          <div className="flex flex-nowrap items-center gap-3 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
+            {MEALS.map((meal) => {
+              const isActive = meal.id === activeMealId;
+              return (
+                <button
+                  key={meal.id}
+                  type="button"
+                  onClick={() => setActiveMealId(meal.id)}
+                  className={`whitespace-nowrap px-5 sm:px-6 py-2.5 rounded-full text-sm sm:text-[15px] transition-all duration-200 cursor-pointer select-none ${
+                    isActive
+                      ? 'bg-[#230E2E] text-white shadow-md shadow-[#230E2E]/15 font-medium'
+                      : 'bg-white text-[#2B1B36] border border-[#E2DCD5] hover:border-[#B5A89E] font-normal shadow-sm'
+                  }`}
+                  style={{
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {meal.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <p className="mono mt-2 text-[10px]">
-          {activeMeal === 2
-            ? 'Complete 10 g cellular protein delivered ✓'
-            : 'The silent 10 g daily deficit'}
-        </p>
-      </div>
 
-      {/* Story disclosure */}
-      <details className="story">
-        <summary>Read the full story · The silent 10-gram deficit & afternoon crash</summary>
-        <div>
-          <p>
-            “Think about your usual afternoon… 2:00 PM or 3:30 PM arrives… You feel that sudden, undeniable fog settling into your mind. Your eyes grow heavy… Your mental sharpness blurs… You find yourself reaching for another sweet tea, a sugary biscuit, or coffee just to keep pushing forward.
-          </p>
-          <p>
-            You thought it was just fatigue, right? But the real science tells a very different story. Standard high-carb meals cause a violent glucose spike… followed by an inevitable crash. Even worse: they starve your body of the essential amino acids it desperately needs to maintain steady neurotransmitters and sustained energy.
-          </p>
-          <p>
-            By missing 10 grams of clean, slow-digesting protein at lunch, your body enters a silent metabolic deficit. It sends emergency hunger and fatigue signals… forcing you to crave quick carbs that restart the vicious cycle all over again…”
-          </p>
+        {/* Right Column: Sleeping man with floating low battery and dreamy ambient glow */}
+        <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end">
+          <div className="relative w-full max-w-[640px] select-none">
+            <img
+              src="/images/afternoon_crash_man.png"
+              alt="Afternoon crash: sleeping at desk with low battery indicator"
+              className="w-full h-auto object-contain block pointer-events-none"
+            />
+          </div>
         </div>
-      </details>
+      </div>
     </section>
   );
 }
