@@ -74,8 +74,8 @@ export default function CleanLabelGuaranteeSection() {
   return (
     <section
       id="clean-label-guarantee"
-      data-bar="0 -0.07 1.15 0 0.12 1 1 0"
-      data-orb="0 -0.05 1.25 320 0.55"
+      data-bar="0.56 -0.09 1.12 0 0.12 1 1 0"
+      data-orb="0.52 -0.08 1.25 320 0.55"
       className="relative z-10 w-full pt-28 pb-24 sm:pt-36 sm:pb-32 px-6 sm:px-12 lg:px-20 bg-transparent text-[#14091F] overflow-hidden"
     >
       {/* Background Soft Glows */}
