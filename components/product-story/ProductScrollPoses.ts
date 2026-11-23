@@ -11,59 +11,59 @@ export interface ProductPose {
 }
 
 export const PRODUCT_POSES: Record<string, ProductPose> = {
-  // Section 01 — Hero: Horizontally centered, sleek scale, slow subtle rotation
+  // Section 01 — Hero: Clean 3D commercial product angle with visible front face and depth
   hero: {
     x: 0.0,
-    y: -0.16,
-    z: 0.5,
-    rotX: 0.08,
-    rotY: 0.12,
-    rotZ: -0.04,
-    scale: 0.95,
+    y: -0.14,
+    z: 0.55,
+    rotX: 0.08,   // subtle 4.5° forward tilt keeping front packaging typography perfectly upright and clear
+    rotY: -0.12,  // subtle 3/4 angle showing elegant length and perspective depth
+    rotZ: 0.0,    // balanced horizontal alignment
+    scale: 1.05,
   },
 
   // Section 02 — Problem: Text on left (cols 1-6), model on right (cols 7-12)
   problem: {
     x: 1.45,
-    y: 0.05,
-    z: 0.3,
-    rotX: -0.22,
-    rotY: 0.35,
-    rotZ: -0.18,
-    scale: 0.82,
+    y: 0.0,
+    z: 0.35,
+    rotX: 0.06,   // pristine, upright angle with no awkward pitch or protrusion
+    rotY: 0.12,   // gentle 3/4 depth
+    rotZ: 0.02,   // slight elegant tilt
+    scale: 0.90,
   },
 
   // Section 03 — Breakthrough: Model on left (cols 1-6), text on right (cols 7-12)
   breakthrough: {
     x: -1.45,
-    y: 0.05,
+    y: 0.0,
     z: 0.35,
-    rotX: 0.22,
-    rotY: -0.28,
-    rotZ: 0.55, // tilted towards vertical orientation
-    scale: 0.85,
+    rotX: 0.06,
+    rotY: -0.12,
+    rotZ: -0.02,
+    scale: 0.90,
   },
 
   // Section 04 — Protein Advantage: Text on left, model on right (zoomed front wrapper)
   proteinAdvantage: {
     x: 1.45,
-    y: 0.05,
-    z: 0.45,
-    rotX: -0.12,
-    rotY: 0.2,
-    rotZ: -0.14,
-    scale: 0.88,
+    y: 0.0,
+    z: 0.40,
+    rotX: 0.06,
+    rotY: 0.10,
+    rotZ: 0.01,
+    scale: 0.92,
   },
 
   // Section 05 — Light on the Stomach: Centered between top heading and bottom subtext
   stomachComfort: {
     x: 0.0,
-    y: -0.08,
+    y: -0.06,
     z: 0.45,
     rotX: 0.05,
-    rotY: 0.02,
-    rotZ: 0.01,
-    scale: 0.9,
+    rotY: 0.0,
+    rotZ: 0.0,
+    scale: 0.95,
   },
 
   // Section 06 — Benefit 01: Text on left, model on right
@@ -71,65 +71,65 @@ export const PRODUCT_POSES: Record<string, ProductPose> = {
     x: 1.45,
     y: 0.0,
     z: 0.35,
-    rotX: 0.14,
-    rotY: 0.3,
-    rotZ: -0.1,
-    scale: 0.82,
+    rotX: 0.06,
+    rotY: 0.12,
+    rotZ: 0.02,
+    scale: 0.88,
   },
 
   // Section 06 — Benefit 02: Model on left, text on right
   benefit2: {
     x: -1.45,
-    y: 0.04,
+    y: 0.02,
     z: 0.35,
-    rotX: -0.16,
-    rotY: -0.25,
-    rotZ: 0.12,
-    scale: 0.82,
+    rotX: 0.06,
+    rotY: -0.12,
+    rotZ: -0.02,
+    scale: 0.88,
   },
 
   // Section 06 — Benefit 03: Text on left, model on right (higher Y position)
   benefit3: {
     x: 1.45,
-    y: 0.18,
+    y: 0.10,
     z: 0.35,
-    rotX: 0.2,
-    rotY: 0.28,
-    rotZ: -0.16,
-    scale: 0.82,
+    rotX: 0.06,
+    rotY: 0.12,
+    rotZ: 0.02,
+    scale: 0.88,
   },
 
   // Section 06 — Benefit 04: Model on left (lower Y position), text on right
   benefit4: {
     x: -1.45,
-    y: -0.18,
+    y: -0.10,
     z: 0.35,
-    rotX: -0.14,
-    rotY: 0.22,
-    rotZ: 0.1,
-    scale: 0.82,
+    rotX: 0.06,
+    rotY: -0.12,
+    rotZ: -0.02,
+    scale: 0.88,
   },
 
   // Section 06 — Benefit 05: Text centered above, model centered below
   benefit5: {
     x: 0.0,
-    y: -0.25,
-    z: 0.5,
-    rotX: 0.05,
-    rotY: 0.08,
-    rotZ: 0.0,
-    scale: 0.88,
-  },
-
-  // Final Section — Meet GoProteen: Centered, front-facing hero presentation
-  finale: {
-    x: 0.0,
-    y: -0.12,
-    z: 0.55,
-    rotX: 0.02,
+    y: -0.20,
+    z: 0.45,
+    rotX: 0.06,
     rotY: 0.0,
     rotZ: 0.0,
-    scale: 0.95,
+    scale: 0.94,
+  },
+
+  // Final Section — Meet GoProteen: Centered, prominent 3D hero presentation
+  finale: {
+    x: 0.0,
+    y: -0.10,
+    z: 0.52,
+    rotX: 0.08,
+    rotY: -0.10,
+    rotZ: 0.0,
+    scale: 1.05,
   },
 };
 

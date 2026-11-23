@@ -93,13 +93,14 @@ export default function CollagenExplorer({
     cameraRef.current = camera;
 
     // 3. Renderer with high-end PBR tone mapping
+    const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 800 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
-      powerPreference: 'high-performance',
+      powerPreference: isMobile ? 'default' : 'high-performance',
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -109,10 +110,10 @@ export default function CollagenExplorer({
 
     // 4. OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = false; // Strictly disable zoom so scrolling the mouse wheel / trackpad scrolls the page normally
+    controls.enablePan = false;
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.minDistance = 5.0;
-    controls.maxDistance = 12.0;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.45; // very gentle subtle drift
     controlsRef.current = controls;
@@ -438,11 +439,17 @@ export default function CollagenExplorer({
     crystalsDataRef.current = crystalsData;
 
     // =========================================================================
-    // 11. ANIMATION TICKER
+    // 11. ANIMATION TICKER WITH OFFSCREEN PAUSE
     // =========================================================================
-    let clock = new THREE.Clock();
+    let isVisible = true;
+    let isLooping = false;
 
     const animate = () => {
+      if (!isVisible) {
+        isLooping = false;
+        return;
+      }
+      isLooping = true;
       animFrameRef.current = requestAnimationFrame(animate);
 
       controls.update();
@@ -464,7 +471,27 @@ export default function CollagenExplorer({
       renderer.render(scene, camera);
     };
 
-    animate();
+    const startAnimation = () => {
+      if (!isLooping) {
+        isLooping = true;
+        animFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    startAnimation();
+
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (isVisible) {
+            startAnimation();
+          }
+        });
+      },
+      { threshold: 0.01 }
+    );
+    visibilityObserver.observe(container);
 
     // =========================================================================
     // 12. RESIZE HANDLER
@@ -481,6 +508,7 @@ export default function CollagenExplorer({
     window.addEventListener('resize', handleResize);
 
     return () => {
+      visibilityObserver.disconnect();
       cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener('resize', handleResize);
       controls.dispose();
@@ -526,7 +554,7 @@ export default function CollagenExplorer({
       {/* ========================================================= */}
       {/* LEFT COLUMN: Section Heading, Narration & Hear Story Button */}
       {/* ========================================================= */}
-      <div className="lg:col-span-4 flex flex-col justify-center space-y-4 z-20 pl-2 sm:pl-4">
+      <div className="lg:col-span-4 flex flex-col justify-center space-y-2 sm:space-y-4 z-20 pl-2 sm:pl-4">
         {/* Top: 03 / 07 with dark underline strictly matching mockup */}
         <div className="space-y-1">
           <span className="font-mono text-xs sm:text-[13px] text-[#5D5066] font-semibold tracking-widest block">
@@ -538,7 +566,7 @@ export default function CollagenExplorer({
         {/* Title: The Mineral Matrix */}
         <div>
           <h2
-            className="text-4xl sm:text-5xl lg:text-[56px] font-light text-[#14091F] tracking-tight leading-[1.0] my-1"
+            className="text-3xl sm:text-5xl lg:text-[56px] font-light text-[#14091F] tracking-tight leading-[1.0] my-1"
             style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             The<br />
@@ -555,7 +583,7 @@ export default function CollagenExplorer({
             </span>
           </h2>
 
-          <p className="text-sm sm:text-base text-stone-600 font-normal mt-2">
+          <p className="text-xs sm:text-base text-stone-600 font-normal mt-1 sm:mt-2">
             The Collagen &amp; Calcium-Phosphate Scaffold
           </p>
         </div>
@@ -568,11 +596,11 @@ export default function CollagenExplorer({
         </div>
 
         {/* Listen Button (Capsule pill matching mockup) */}
-        <div className="pt-1">
+        <div className="pt-0.5 sm:pt-1">
           <button
             type="button"
             onClick={handleAudio}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-stone-50 text-xs font-mono font-bold text-[#14091F] border border-stone-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white hover:bg-stone-50 text-xs font-mono font-bold text-[#14091F] border border-stone-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
             title={audioActive ? 'Pause Narration' : 'Listen to Narration'}
           >
             {audioActive ? (
@@ -593,7 +621,7 @@ export default function CollagenExplorer({
       {/* ========================================================= */}
       {/* CENTER COLUMN: Diagonal 3D Collagen Triple Helix with Gem Crystals */}
       {/* ========================================================= */}
-      <div className="lg:col-span-5 flex flex-col items-center justify-center relative w-full h-[540px] sm:h-[580px] lg:h-[640px] xl:h-[680px] max-h-[84vh] overflow-visible">
+      <div className="lg:col-span-5 flex flex-col items-center justify-center relative w-full h-[280px] sm:h-[400px] lg:h-[640px] xl:h-[680px] max-h-[50vh] lg:max-h-[84vh] overflow-visible my-1 lg:my-0">
         {/* Soft Dreamy Pastel Depth Blur Glow */}
         <div
           className="absolute inset-0 pointer-events-none z-0 rounded-full blur-[85px] opacity-75"
@@ -665,9 +693,9 @@ export default function CollagenExplorer({
       </div>
 
       {/* ========================================================= */}
-      {/* RIGHT COLUMN: Curved Vertical Timeline with 3 Nodes (Exact Mockup Match) */}
+      {/* RIGHT COLUMN: Curved Vertical Timeline with 3 Nodes (Hidden on mobile to fit screen) */}
       {/* ========================================================= */}
-      <div className="lg:col-span-3 flex items-center justify-start relative z-20 py-4 pr-2 sm:pr-4">
+      <div className="hidden lg:flex lg:col-span-3 items-center justify-start relative z-20 py-4 pr-2 sm:pr-4">
         {/* Container for Curved Line + 3 Interactive Exploration Items */}
         <div className="relative flex items-center w-full">
           {/* Elegant SVG Curved Connecting Line */}

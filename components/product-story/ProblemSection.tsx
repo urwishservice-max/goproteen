@@ -57,8 +57,8 @@ export default function ProblemSection() {
         <div className="lg:col-span-6 w-full h-[360px] sm:h-[460px] lg:h-[520px] relative flex items-center justify-center">
           <GoProteenProduct
             className="w-full h-full"
-            position={[0.3, -0.15, 0.2]}
-            rotation={[-0.22, 0.35, -0.15]}
+            position={[0.3, -0.05, 0.2]}
+            rotation={[0.06, 0.14, 0.02]}
             scale={1.12}
             autoRotateSpeed={0.0025}
             interactive={true}

@@ -68,17 +68,20 @@ export default function MuscleExperience({
     cameraRef.current = camera;
 
     // 3. Renderer with Alpha
+    const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 800 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
-      powerPreference: 'high-performance',
+      powerPreference: isMobile ? 'default' : 'high-performance',
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.22;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = !isMobile;
+    if (!isMobile) {
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
 
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -188,8 +191,16 @@ export default function MuscleExperience({
       }
     );
 
-    // 8. Animation & Render Loop
+    // 8. Animation & Render Loop with Offscreen Pause
+    let isVisible = true;
+    let isLooping = false;
+
     const animate = () => {
+      if (!isVisible) {
+        isLooping = false;
+        return;
+      }
+      isLooping = true;
       animFrameIdRef.current = requestAnimationFrame(animate);
 
       // Smooth interpolation for muscle volume transformation (8% per frame)
@@ -210,7 +221,28 @@ export default function MuscleExperience({
       renderer.render(scene, camera);
     };
 
-    animate();
+    const startAnimation = () => {
+      if (!isLooping) {
+        isLooping = true;
+        animFrameIdRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    startAnimation();
+
+    // IntersectionObserver to pause loop when scrolled away
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (isVisible) {
+            startAnimation();
+          }
+        });
+      },
+      { threshold: 0.01 }
+    );
+    visibilityObserver.observe(mount);
 
     // 9. Resize Observer ensuring strictly preserved aspect ratio
     const handleResize = () => {
@@ -229,6 +261,7 @@ export default function MuscleExperience({
 
     // Safe Cleanup
     return () => {
+      visibilityObserver.disconnect();
       if (animFrameIdRef.current) {
         cancelAnimationFrame(animFrameIdRef.current);
       }

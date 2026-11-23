@@ -215,7 +215,7 @@ export default function Product3DStoryExperience() {
     lastPointerY: 0,
     barGroup: null as THREE.Group | null,
     wrapperMesh: null as THREE.Mesh | null,
-    innerBarMesh: null as THREE.Mesh | null,
+    innerBarMesh: null as THREE.Object3D | null,
     crunchTrigger: null as (() => void) | null,
   });
 
@@ -415,54 +415,35 @@ export default function Product3DStoryExperience() {
       '/models/GoProTeen_model.glb',
       (gltf) => {
         const model = gltf.scene;
-        let foundWrapper: THREE.Mesh | null = null;
-        let foundInner: THREE.Mesh | null = null;
-
-        model.traverse((child: any) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            if (
-              child.name.includes('Wrapper') ||
-              child.material?.name?.includes('Print') ||
-              child.name === 'GoProTeen_Main_Wrapper'
-            ) {
-              foundWrapper = child;
-            } else if (
-              child.name.includes('Bar') ||
-              child.material?.name?.includes('Chocolate') ||
-              child.name === 'GoProTeen_Inner_Chocolate_Bar'
-            ) {
-              foundInner = child;
-            }
-          }
-        });
-
         const scaleFactor = 17.0;
+
+        const foundWrapper = (model.getObjectByName('GoProTeen_Main_Wrapper') as THREE.Mesh) || null;
+        const foundInner = model.getObjectByName('GP_EXPLODE_CONTROLLER') || null;
 
         if (foundWrapper) {
           foundWrapper.scale.setScalar(scaleFactor);
           if (foundWrapper.material) {
-            const mat = foundWrapper.material as THREE.MeshStandardMaterial;
+            const mat = (foundWrapper.material as THREE.MeshStandardMaterial).clone();
             mat.roughness = 0.26;
             mat.metalness = 0.04;
             mat.envMapIntensity = 1.25;
             mat.needsUpdate = true;
+            foundWrapper.material = mat;
           }
           bar.add(foundWrapper);
           stateRef.current.wrapperMesh = foundWrapper;
         }
 
         if (foundInner) {
-          foundInner.scale.setScalar(scaleFactor);
-          if (foundInner.material) {
-            const bMat = foundInner.material as THREE.MeshStandardMaterial;
-            bMat.bumpMap = bumpMap;
-            bMat.bumpScale = 1.2;
-            bMat.roughness = 0.38;
-            bMat.envMapIntensity = 0.8;
-            bMat.needsUpdate = true;
-          }
+          foundInner.scale.multiplyScalar(scaleFactor);
+          foundInner.position.multiplyScalar(scaleFactor);
+          foundInner.traverse((child: any) => {
+            if (child.isMesh && child.material) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              child.material = (child.material as THREE.Material).clone();
+            }
+          });
           bar.add(foundInner);
           stateRef.current.innerBarMesh = foundInner;
         }

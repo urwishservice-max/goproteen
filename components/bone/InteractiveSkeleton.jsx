@@ -7,8 +7,8 @@ import * as THREE from 'three';
 
 const MODEL_PATH = '/models/z_anatomy_skeleton.glb';
 
-// Preload GLB for instant rendering
-useGLTF.preload(MODEL_PATH);
+// Only load when mounted in viewport
+// (Preload removed to prevent mobile bandwidth saturation on initial load)
 
 // Calibrated camera coordinates:
 // - Default view: Full-body skeleton overview that commands the screen with healthy margins.
@@ -307,6 +307,7 @@ export default function InteractiveSkeleton({
     >
       <Suspense fallback={<SkeletonLoader />}>
         <Canvas
+          dpr={[1, typeof window !== 'undefined' && window.innerWidth <= 800 ? 1.0 : 1.5]}
           camera={{
             position: [0, 0, 2.55], // Static initial overview position — prevents cutscene snapping on re-render!
             fov: 44,
@@ -352,13 +353,11 @@ export default function InteractiveSkeleton({
             onSelectPart={handleSelectPart}
           />
 
-          {/* Camera Controls: 3D rotation with smooth damping and responsive close zoom */}
+          {/* Camera Controls: 3D rotation with smooth damping and page-safe scroll (zoom disabled) */}
           <OrbitControls
             ref={controlsRef}
             enablePan={false}
-            enableZoom={true}
-            minDistance={0.30}
-            maxDistance={4.5}
+            enableZoom={false}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={(5 * Math.PI) / 6}
             enableDamping={true}

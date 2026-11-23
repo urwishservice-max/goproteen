@@ -88,10 +88,8 @@ function CameraController({ activeMode }) {
   return (
     <OrbitControls
       ref={controlsRef}
-      enableZoom={true}
+      enableZoom={false}
       enablePan={false}
-      minDistance={5.5}
-      maxDistance={13.0}
       minPolarAngle={Math.PI / 3.6}
       maxPolarAngle={Math.PI / 2.05}
       enableDamping={true}
@@ -199,6 +197,7 @@ export default function BoneRemodelingScene({
   return (
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing select-none min-h-[460px]">
       <Canvas
+        dpr={[1, typeof window !== 'undefined' && window.innerWidth <= 800 ? 1.0 : 1.5]}
         camera={{ position: [0, 1.35, 9.4], fov: 34 }}
         style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
         gl={{

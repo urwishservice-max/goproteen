@@ -67,7 +67,9 @@ export default function SynbioticAdvantageSection() {
   return (
     <section
       id="synbiotic-advantage"
-      className="relative z-20 w-full py-24 sm:py-32 px-6 sm:px-12 lg:px-20 bg-[#FDFBF7] text-[#14091F] overflow-hidden border-t border-b border-[#EBE5DE]/80"
+      data-bar="0 0 0 0 0 0 0 0"
+      data-orb="0.3 0 1.2 110 0.7"
+      className="relative z-20 w-full py-24 sm:py-32 px-6 sm:px-12 lg:px-20 bg-transparent text-[#14091F] overflow-hidden border-t border-b border-[#EBE5DE]/80"
     >
       {/* Background Ambient Glows */}
       <div
@@ -104,9 +106,8 @@ export default function SynbioticAdvantageSection() {
             className="group flex items-center gap-2.5 px-5 py-2 rounded-full border border-[#E5DFD7] bg-white/80 hover:bg-white hover:border-[#14091F] transition-all duration-300 text-xs font-mono uppercase tracking-wider text-[#14091F] shadow-sm backdrop-blur-sm cursor-pointer"
           >
             <span
-              className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                isPlayingAudio ? 'bg-rose-500 animate-pulse' : 'bg-[#14091F]'
-              }`}
+              className={`w-2 h-2 rounded-full transition-colors duration-300 ${isPlayingAudio ? 'bg-rose-500 animate-pulse' : 'bg-[#14091F]'
+                }`}
             />
             <span>{isPlayingAudio ? 'Pause Narration' : 'Listen'}</span>
           </button>

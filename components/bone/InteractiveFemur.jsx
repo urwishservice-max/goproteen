@@ -7,8 +7,8 @@ import * as THREE from 'three';
 
 const FEMUR_MODEL_PATH = '/models/femur_cutaway.glb';
 
-// Preload GLB
-useGLTF.preload(FEMUR_MODEL_PATH);
+// Only load when mounted in viewport
+// (Preload removed to prevent mobile bandwidth saturation on initial load)
 
 function FemurMesh({ age = 30 }) {
   const { scene } = useGLTF(FEMUR_MODEL_PATH);
@@ -142,6 +142,7 @@ export default function InteractiveFemur({ age = 30 }) {
     <div className="relative w-full h-full flex items-center justify-center select-none overflow-visible">
       <Suspense fallback={<Loader />}>
         <Canvas
+          dpr={[1, typeof window !== 'undefined' && window.innerWidth <= 800 ? 1.0 : 1.5]}
           camera={{
             position: [0.0, 0.02, 0.74],
             fov: 38,
@@ -158,7 +159,7 @@ export default function InteractiveFemur({ age = 30 }) {
           style={{ background: 'transparent' }}
         >
           {/* Calibrated Natural Studio Lighting (Shadow Depth without Overexposure) */}
-          <ambientLight intensity={0.42} color="#FFFDF7" />
+          <ambientLight intensity={0.42} color="#FFFFFF" />
           <directionalLight
             position={[3.0, 4.0, 3.2]}
             intensity={0.78}
@@ -185,13 +186,11 @@ export default function InteractiveFemur({ age = 30 }) {
           {/* 3D Femur with dynamic age deformation */}
           <FemurMesh age={age} />
 
-          {/* Orbit controls with damped rotation and unhindered close zoom */}
+          {/* Orbit controls with damped rotation and page-safe scroll (zoom disabled) */}
           <OrbitControls
             ref={controlsRef}
             enablePan={false}
-            enableZoom={true}
-            minDistance={0.15}
-            maxDistance={1.4}
+            enableZoom={false}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={(5 * Math.PI) / 6}
             enableDamping={true}

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import gsap from 'gsap';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -58,6 +59,16 @@ export default function GoProteenPage() {
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [userAge, setUserAge] = useState(30);
   const [cellAge, setCellAge] = useState(30);
+  const [userAgeInput, setUserAgeInput] = useState('30');
+  const [cellAgeInput, setCellAgeInput] = useState('30');
+
+  useEffect(() => {
+    setUserAgeInput(String(userAge));
+  }, [userAge]);
+
+  useEffect(() => {
+    setCellAgeInput(String(cellAge));
+  }, [cellAge]);
   const [isProteinBound, setIsProteinBound] = useState(false);
   const [cellAudioPlaying, setCellAudioPlaying] = useState(false);
   const [muscleMode, setMuscleMode] = useState<'loss' | 'gain'>('loss');
@@ -401,29 +412,65 @@ export default function GoProteenPage() {
       };
     }
 
-    // Section 8: Anatomy exploded view
+    // Section 8: Anatomy exploded view with smooth GSAP transitions
     const LAY = [
-      'Textured chocolate-style coating that keeps every bite satisfying.',
-      'Whole almonds and cashews for real crunch.',
-      '10 g of fermented yeast protein with complete essential amino acids, plus prebiotic fibre and probiotics.*',
-      'Sweetened purely with date paste: 0% added sugar.',
+      'Crunchy top chocolate shell with custom textured ridges.',
+      'Whole roasted almonds, creamy cashews, and rich dates embedded throughout.',
+      '10 g of fermented yeast protein core with complete essential amino acids.',
+      'Pure date paste foundation and bottom chocolate coating: 0% added sugar.',
     ];
     const exr = $('#exr') as HTMLInputElement | null;
+    let explodeTween: gsap.core.Tween | null = null;
+
+    function animateToExplode(targetVal: number, duration: number = 0.8) {
+      if (explodeTween) explodeTween.kill();
+      const state = { val: EX };
+      explodeTween = gsap.to(state, {
+        val: targetVal,
+        duration,
+        ease: 'power2.inOut',
+        onUpdate: () => {
+          EX = state.val;
+          if (exr) exr.value = Math.round(state.val * 100).toString();
+        },
+        onComplete: () => {
+          explodeTween = null;
+        },
+      });
+    }
+
     if (exr) {
       exr.oninput = function () {
+        if (explodeTween) {
+          explodeTween.kill();
+          explodeTween = null;
+        }
         EX = +exr.value / 100;
-        SEL = -1;
-        $$('.anat button').forEach((x) => x.classList.remove('on'));
+        if (EX < 0.05) {
+          SEL = -1;
+          $$('.anat button').forEach((x) => x.classList.remove('on'));
+        }
       };
     }
+
     $$('.anat button').forEach((b) =>
       b.addEventListener('click', () => {
-        SEL = +(b.dataset.i || 0);
-        EX = 1;
-        if (exr) exr.value = '100';
-        $$('.anat button').forEach((x) => x.classList.toggle('on', x === b));
-        const info = $('#info');
-        if (info) info.textContent = LAY[SEL];
+        const idx = +(b.dataset.i || 0);
+        // If clicking the currently active layer button, smoothly reverse back to assembled!
+        if (SEL === idx && EX > 0.4) {
+          SEL = -1;
+          $$('.anat button').forEach((x) => x.classList.remove('on'));
+          animateToExplode(0, 0.7);
+          const info = $('#info');
+          if (info) info.textContent = 'Slide to explode the bar, or tap a layer.';
+        } else {
+          // Explode out smoothly to true vertical separated view and highlight layer
+          SEL = idx;
+          $$('.anat button').forEach((x) => x.classList.toggle('on', x === b));
+          animateToExplode(1, 0.85);
+          const info = $('#info');
+          if (info) info.textContent = LAY[SEL];
+        }
       })
     );
 
@@ -739,6 +786,35 @@ export default function GoProteenPage() {
     window.addEventListener('input', () => setTimeout(pick, 0));
     pick();
 
+    if (typeof window !== 'undefined') {
+      if (
+        window.location.search.includes('explode=1') ||
+        window.location.hash.includes('explode=1')
+      ) {
+        EX = 1;
+        const exr = $('#exr') as HTMLInputElement | null;
+        if (exr) exr.value = '100';
+      }
+      if (
+        window.location.search.includes('unwrap=1') ||
+        window.location.hash.includes('unwrap=1')
+      ) {
+        UW = 0;
+        const uw = $('#uw');
+        if (uw) uw.textContent = 'Wrap it again';
+      }
+      if (window.location.hash) {
+        setTimeout(() => {
+          const targetHash = window.location.hash.split('?')[0];
+          const targetSec = document.querySelector(targetHash);
+          if (targetSec) {
+            targetSec.scrollIntoView({ behavior: 'auto', block: 'center' });
+            pick();
+          }
+        }, 300);
+      }
+    }
+
     // Section dots
     const dt = $('#dots');
     if (dt && dt.children.length === 0) {
@@ -837,12 +913,14 @@ export default function GoProteenPage() {
       const cv = $('#c') as HTMLCanvasElement | null;
       if (!cv) return;
 
+      const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 800 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
       const r = new THREE.WebGLRenderer({
         canvas: cv,
         alpha: true,
-        antialias: window.innerWidth > 800,
+        antialias: !isMobile,
+        powerPreference: isMobile ? 'default' : 'high-performance',
       });
-      r.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth > 800 ? 1.5 : 1.25));
+      r.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5));
       r.toneMapping = THREE.ACESFilmicToneMapping;
       r.toneMappingExposure = 1.35;
       r.outputColorSpace = THREE.SRGBColorSpace;
@@ -982,7 +1060,15 @@ export default function GoProteenPage() {
 
       let useGLB = false;
       let wrapperMesh: THREE.Mesh | null = null;
-      let innerBarMesh: THREE.Mesh | null = null;
+      let innerBarController: THREE.Object3D | null = null;
+      let layerTop: THREE.Object3D | null = null;
+      let layerCore: THREE.Object3D | null = null;
+      let layerBottom: THREE.Object3D | null = null;
+      let topMat: THREE.MeshStandardMaterial | null = null;
+      let coreMat: THREE.MeshStandardMaterial | null = null;
+      let bottomMat: THREE.MeshStandardMaterial | null = null;
+      const nutMats: THREE.MeshStandardMaterial[] = [];
+      const nutObjects: { obj: THREE.Object3D; initY: number }[] = [];
 
       // Load GoProTeen_model.glb
       const gltfLoader = new GLTFLoader();
@@ -990,61 +1076,103 @@ export default function GoProteenPage() {
         '/models/GoProTeen_model.glb',
         (gltf) => {
           const model = gltf.scene;
-
-          model.traverse((child: any) => {
-            if (child.isMesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-              if (
-                child.name.includes('Wrapper') ||
-                child.material?.name?.includes('Print') ||
-                child.name === 'GoProTeen_Main_Wrapper'
-              ) {
-                wrapperMesh = child;
-              } else if (
-                child.name.includes('Bar') ||
-                child.material?.name?.includes('Chocolate') ||
-                child.name === 'GoProTeen_Inner_Chocolate_Bar'
-              ) {
-                innerBarMesh = child;
-              }
-            }
-          });
-
-          // Scale factor for GLB model: wrapper is ~0.145m -> enhanced hero product scale
           const scaleFactor = 17.2;
 
+          wrapperMesh = (model.getObjectByName('GoProTeen_Main_Wrapper') as THREE.Mesh) || null;
           if (wrapperMesh) {
             wrapperMesh.scale.setScalar(scaleFactor);
+            wrapperMesh.rotation.set(0, 0, 0);
             if (wrapperMesh.material) {
-              const mat = wrapperMesh.material as THREE.MeshStandardMaterial;
+              const mat = (wrapperMesh.material as THREE.MeshStandardMaterial).clone();
               mat.transparent = true;
               mat.roughness = 0.28;
               mat.metalness = 0.04;
-              mat.envMapIntensity = 1.2;
-              mat.needsUpdate = true;
+              mat.envMapIntensity = 1.25;
+              wrapperMesh.material = mat;
             }
             glbWrapperGroup.add(wrapperMesh);
             useGLB = true;
           }
 
-          if (innerBarMesh) {
-            innerBarMesh.scale.setScalar(scaleFactor);
-            if (innerBarMesh.material) {
-              const bMat = innerBarMesh.material as THREE.MeshStandardMaterial;
-              bMat.bumpMap = bump;
-              bMat.bumpScale = 1.4;
-              bMat.roughness = 0.38;
-              bMat.envMapIntensity = 0.8;
-              bMat.needsUpdate = true;
+          innerBarController = model.getObjectByName('GP_EXPLODE_CONTROLLER') || null;
+          if (innerBarController) {
+            // Scaled down to 0.75 so the inside bar fits comfortably and snugly inside the package cavity
+            innerBarController.scale.setScalar(scaleFactor * 0.75);
+            innerBarController.position.set(0, 0, 0);
+            innerBarController.rotation.set(Math.PI / 2, 0, 0);
+
+            layerTop = innerBarController.getObjectByName('GP_LAYER_TOP') || null;
+            layerCore = innerBarController.getObjectByName('GP_LAYER_CORE') || null;
+            layerBottom = innerBarController.getObjectByName('GP_LAYER_BOTTOM') || null;
+
+            const topShell = innerBarController.getObjectByName('GP_TOP_CHOCOLATE_SHELL') as THREE.Mesh | null;
+            if (topShell && topShell.material) {
+              topMat = (topShell.material as THREE.MeshStandardMaterial).clone();
+              topMat.roughness = 0.32;
+              topMat.envMapIntensity = 1.15;
+              topShell.material = topMat;
             }
-            glbBarGroup.add(innerBarMesh);
+
+            const bottomShell = innerBarController.getObjectByName('GP_BOTTOM_CHOCOLATE_SHELL') as THREE.Mesh | null;
+            if (bottomShell && bottomShell.material) {
+              bottomMat = (bottomShell.material as THREE.MeshStandardMaterial).clone();
+              bottomMat.roughness = 0.32;
+              bottomMat.envMapIntensity = 1.15;
+              bottomShell.material = bottomMat;
+            }
+
+            const coreMesh = innerBarController.getObjectByName('GP_PROTEIN_NUT_CORE') as THREE.Mesh | null;
+            if (coreMesh && coreMesh.material) {
+              coreMat = (coreMesh.material as THREE.MeshStandardMaterial).clone();
+              coreMat.color = new THREE.Color(0x6e4324); // Rich roasted nut & protein core
+              coreMat.roughness = 0.68;
+              coreMat.bumpMap = bump;
+              coreMat.bumpScale = 1.1;
+              coreMat.envMapIntensity = 0.9;
+              coreMesh.material = coreMat;
+
+              coreMesh.children.forEach((child) => {
+                const cName = child.name;
+                if (
+                  cName.startsWith('GP_Almond') ||
+                  cName.startsWith('GP_Cashew') ||
+                  cName.startsWith('GP_Date')
+                ) {
+                  nutObjects.push({ obj: child, initY: child.position.y });
+                  const m = child as THREE.Mesh;
+                  if (m.material) {
+                    const nMat = (m.material as THREE.MeshStandardMaterial).clone();
+                    if (cName.startsWith('GP_Almond')) {
+                      nMat.color = new THREE.Color(0x9a6435); // Golden almond
+                      nMat.roughness = 0.42;
+                    } else if (cName.startsWith('GP_Cashew')) {
+                      nMat.color = new THREE.Color(0xdcc8a4); // Creamy cashew
+                      nMat.roughness = 0.35;
+                    } else if (cName.startsWith('GP_Date')) {
+                      nMat.color = new THREE.Color(0x2d1208); // Dark sweet date
+                      nMat.roughness = 0.22;
+                    }
+                    nMat.envMapIntensity = 1.15;
+                    m.material = nMat;
+                    if (!nutMats.includes(nMat)) {
+                      nutMats.push(nMat);
+                    }
+                  }
+                }
+              });
+            }
+
+            glbBarGroup.add(innerBarController);
+            (window as any)._innerBar = innerBarController;
+            (window as any)._wrapperMesh = wrapperMesh;
+            (window as any)._bar = bar;
             useGLB = true;
           }
 
           if (useGLB) {
             body.visible = false;
             wg.visible = false;
+            layers.visible = false;
           }
         },
         undefined,
@@ -1130,8 +1258,11 @@ export default function GoProteenPage() {
       let spVal = 0;
       let ea = 0;
       let ev = 0;
+      let userPitch = 0;
+      let userPitchVel = 0;
       let isDown = 0;
       let lx = 0;
+      let ly = 0;
       let mv = 0;
       const cur = { x: 0, y: -0.02, s: 1.4, ry: 0, rx: 0, op: 1, w: 1, ex: 0 };
 
@@ -1140,10 +1271,13 @@ export default function GoProteenPage() {
         my = e.clientY / window.innerHeight - 0.5;
         mo.position.set(mx * 8, -my * 6, 4.5);
         if (isDown) {
-          const d = e.clientX - lx;
+          const dx = e.clientX - lx;
+          const dy = e.clientY - ly;
           lx = e.clientX;
-          mv += Math.abs(d);
-          ev = d * 0.012;
+          ly = e.clientY;
+          mv += Math.abs(dx) + Math.abs(dy);
+          ev = dx * 0.012;
+          userPitchVel = dy * 0.009;
         }
       });
 
@@ -1152,6 +1286,7 @@ export default function GoProteenPage() {
         if (target?.closest('button,input,a,.track,.card,.cells')) return;
         isDown = 1;
         lx = e.clientX;
+        ly = e.clientY;
         mv = 0;
       });
 
@@ -1173,6 +1308,8 @@ export default function GoProteenPage() {
 
       function size() {
         if (!cv) return;
+        const isMob = typeof window !== 'undefined' && (window.innerWidth <= 800 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
+        r.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMob ? 1.0 : 1.5));
         r.setSize(window.innerWidth, window.innerHeight, false);
         cam.aspect = window.innerWidth / window.innerHeight;
         cam.updateProjectionMatrix();
@@ -1211,26 +1348,82 @@ export default function GoProteenPage() {
 
         spVal += (window.scrollY * 0.0014 - spVal) * 0.06;
         ea += ev;
-        ev *= 0.94;
-        ea *= 0.997;
+        ev *= 0.92;
+        ea *= 0.998;
+        userPitch += userPitchVel;
+        userPitchVel *= 0.92;
+        userPitch = Math.max(-0.85, Math.min(0.85, userPitch));
 
         if (useGLB) {
           body.visible = false;
           wg.visible = false;
+          layers.visible = false;
 
           glbWrapperGroup.visible = cur.w > 0.02;
-          glbWrapperGroup.position.x = (1 - cur.w) * 3;
+          glbWrapperGroup.position.x = (1 - cur.w) * 3.2;
           if (wrapperMesh && wrapperMesh.material) {
             (wrapperMesh.material as THREE.Material).opacity = cur.w;
           }
 
-          glbBarGroup.visible = cur.ex < 0.03;
-          layers.visible = cur.ex >= 0.03;
-          lms.forEach((m, i) => {
-            m.position.y = Y[i] + (1.5 - i) * cur.ex * 0.34;
-            lmats[i].emissiveIntensity +=
-              ((SEL === i ? 0.7 : 0) - lmats[i].emissiveIntensity) * 0.12;
+          // Inside bar assembly is visible when unwrapped or exploded
+          glbBarGroup.visible = cur.w < 0.96 || cur.ex > 0.05;
+
+          const isAnat = (secs[act] && secs[act].id === 'anat') || cur.ex > 0.02;
+
+          if (innerBarController) {
+            // In wrapped & unwrapped presentation (Section 7 and everywhere else),
+            // rotate the inner bar by Math.PI / 2 so its broad rippled face matches the wrapper packaging.
+            // When in Section 8 (Anatomy exploded view), smoothly rotate to 0 so layers explode vertically.
+            const targetRotX = isAnat ? 0 : Math.PI / 2;
+            innerBarController.rotation.x += (targetRotX - innerBarController.rotation.x) * 0.12;
+            innerBarController.rotation.y = 0;
+            innerBarController.rotation.z = 0;
+          }
+
+          // True vertical exploded view with separated whole nuts & dates layer:
+          // 1. Top chocolate coating moves straight up (+Y)
+          if (layerTop) {
+            layerTop.position.set(0, cur.ex * 0.048, 0);
+            layerTop.rotation.set(0, 0, 0);
+          }
+          // 2. Whole roasted nuts and dates separate cleanly above the core (+Y)
+          nutObjects.forEach(({ obj, initY }) => {
+            obj.position.y = initY + cur.ex * 0.022;
           });
+          // 3. Middle protein filling core remains at center (Y = 0)
+          if (layerCore) {
+            layerCore.position.set(0, 0, 0);
+            layerCore.rotation.set(0, 0, 0);
+          }
+          // 4. Bottom chocolate coating drops straight down (-Y)
+          if (layerBottom) {
+            layerBottom.position.set(0, -cur.ex * 0.036, 0);
+            layerBottom.rotation.set(0, 0, 0);
+          }
+
+          // Interactive layer highlight when buttons are clicked (SEL: 0=coat, 1=nuts, 2=core, 3=base)
+          if (topMat) {
+            const targetEm = SEL === 0 ? 0.7 : 0;
+            topMat.emissive.setHex(0xff8a2b);
+            topMat.emissiveIntensity += (targetEm - topMat.emissiveIntensity) * 0.14;
+          }
+          if (nutMats.length > 0) {
+            const targetEm = SEL === 1 ? 0.8 : 0;
+            nutMats.forEach((mat) => {
+              mat.emissive.setHex(0xffaa44);
+              mat.emissiveIntensity += (targetEm - mat.emissiveIntensity) * 0.14;
+            });
+          }
+          if (coreMat) {
+            const targetEm = SEL === 2 ? 0.7 : 0;
+            coreMat.emissive.setHex(0xff8a2b);
+            coreMat.emissiveIntensity += (targetEm - coreMat.emissiveIntensity) * 0.14;
+          }
+          if (bottomMat) {
+            const targetEm = SEL === 3 ? 0.7 : 0;
+            bottomMat.emissive.setHex(0xff8a2b);
+            bottomMat.emissiveIntensity += (targetEm - bottomMat.emissiveIntensity) * 0.14;
+          }
         } else {
           body.visible = cur.ex < 0.03;
           layers.visible = !body.visible;
@@ -1262,14 +1455,30 @@ export default function GoProteenPage() {
 
         bar.position.set(cur.x * hw * 0.55, cur.y + Math.sin(t * 0.0012) * 0.05, 0);
         bar.scale.set(S * (1 + 0.16 * punch), S * (1 - 0.16 * punch), S * (1 + 0.16 * punch));
-        bar.rotation.set(
-          cur.rx * 0.5 + my * 0.22,
-          cur.ry + mx * 0.35 + spVal + ea,
-          -my * 0.04 + mx * 0.06
-        );
+        const isAnat = (secs[act] && secs[act].id === 'anat') || cur.ex > 0.02;
+        const isMeet = secs[act] && secs[act].id === 'meet';
+        const activeSpVal = (isAnat || isMeet) ? 0 : spVal;
+
+        if (isAnat) {
+          // Interactive 3D rotation in Anatomy view: user can drag to rotate horizontally (yaw) and vertically (pitch)
+          bar.rotation.set(
+            cur.rx + my * 0.08 + userPitch,
+            cur.ry + mx * 0.12 + ea,
+            0
+          );
+        } else {
+          bar.rotation.set(
+            cur.rx * 0.5 + my * 0.22 + userPitch,
+            cur.ry + mx * 0.35 + activeSpVal + ea,
+            -my * 0.04 + mx * 0.06
+          );
+        }
 
         cv.style.opacity = String(cur.op);
-        r.render(sc, cam);
+        // Skip expensive 3D rendering when canvas is hidden or in bone/crash sections
+        if (cur.op > 0.005 && !document.body.classList.contains('in-bone-section') && !document.body.classList.contains('in-crash-section')) {
+          r.render(sc, cam);
+        }
       }
 
       requestAnimationFrame(loop);
@@ -1376,46 +1585,46 @@ export default function GoProteenPage() {
               {/* Left Column: Clean Title & Audio */}
               <div className="lg:col-span-5 flex flex-col justify-center z-10">
                 {/* Category Tracker */}
-                <span className="mono r" style={{ marginBottom: '1vh', display: 'inline-block' }}>
+                <span className="mono r text-[10px] sm:text-xs font-mono tracking-widest uppercase text-[#8A7993] mb-1 block">
                   The quiet breakdown
                 </span>
 
                 {/* Main Headline */}
-                <h2 className="r" style={{ margin: '0.5vh 0 2vh', fontSize: 'clamp(2.2rem, 3.8vw, 3.5rem)', lineHeight: 1.02 }}>
+                <h2 className="r text-[1.4rem] sm:text-[2.1rem] lg:text-[2.9rem] font-light tracking-tight leading-[1.08] sm:leading-[1.02] text-[#14091F] mb-1.5 sm:mb-2">
                   The silent loss of<br />
                   independence.
                 </h2>
 
                 {/* Audio Player Bar */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 mb-1 sm:mb-0">
                   <button
                     type="button"
                     onClick={toggleNarration}
-                    className="w-10 h-10 rounded-full bg-[#14091F] hover:bg-[#251535] text-white flex items-center justify-center transition-all duration-300 shadow-sm hover:scale-105 active:scale-95 group focus:outline-none cursor-pointer"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#14091F] hover:bg-[#251535] text-white flex items-center justify-center transition-all duration-300 shadow-sm hover:scale-105 active:scale-95 group focus:outline-none cursor-pointer shrink-0"
                     title={audioPlaying ? 'Pause narration' : 'Hear the story'}
                     aria-label={audioPlaying ? 'Pause narration' : 'Hear the story'}
                   >
                     {audioPlaying ? (
-                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" viewBox="0 0 24 24">
                         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                       </svg>
                     ) : (
-                      <svg className="w-3.5 h-3.5 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current translate-x-0.5" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
                   </button>
-                  <span className="mono" style={{ textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.14em', color: 'var(--mut)' }}>
+                  <span className="mono" style={{ textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.12em', color: 'var(--mut)' }}>
                     Hear the story
                   </span>
-                  <div className="flex items-center gap-1 h-5 px-1">
+                  <div className="flex items-center gap-1 h-4 sm:h-5 px-1">
                     {[6, 12, 18, 9, 16, 22, 14, 18, 24, 11, 16, 7, 4].map((h, i) => (
                       <span
                         key={i}
                         className={`w-[2px] rounded-full bg-[#14091F] transition-all duration-200 ${
                           audioPlaying ? `animate-eq-${(i % 5) + 1}` : 'opacity-35'
                         }`}
-                        style={{ height: audioPlaying ? `${h}px` : `${Math.max(3, h * 0.45)}px` }}
+                        style={{ height: audioPlaying ? `${Math.max(3, h * 0.7)}px` : `${Math.max(3, h * 0.35)}px` }}
                       />
                     ))}
                   </div>
@@ -1424,7 +1633,7 @@ export default function GoProteenPage() {
 
               {/* Right Column: Large Anatomical Arm with 3D Interactive Muscle Experience */}
               <div className="lg:col-span-7 relative flex items-center justify-center">
-                <div className="relative w-full h-[390px] sm:h-[450px] lg:h-[490px] xl:h-[520px] flex items-center justify-center">
+                <div className="relative w-full h-[220px] sm:h-[320px] lg:h-[490px] xl:h-[520px] flex items-center justify-center my-1 sm:my-2 lg:my-0">
                   {/* 3D WebGL Muscle Experience Component */}
                   <MuscleExperience
                     userAge={userAge}
@@ -1433,58 +1642,85 @@ export default function GoProteenPage() {
               </div>
             </div>
 
-            {/* Bottom Interactive Age Slider & Progression (Completely Borderless & Box-free) */}
-            <div className="w-full pt-2 pb-1">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
-                {/* Col 1: Single Age Control with Stepper & Direct Entry */}
-                <div className="md:col-span-3 flex flex-col">
-                  <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mut)', marginBottom: '8px' }}>
-                    Enter Your Age
-                  </span>
-                  <div className="inline-flex items-center justify-between rounded-full bg-white/80 p-1 w-36 shadow-xs">
-                    <button
-                      type="button"
-                      onClick={() => setUserAge((a) => Math.max(30, a - 5))}
-                      className="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all text-base focus:outline-none cursor-pointer"
-                      title="Decrease age"
-                      aria-label="Decrease age"
+            {/* Bottom Interactive Age Slider & Progression */}
+            <div className="w-full pt-1 sm:pt-2 pb-1">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-6 md:gap-8 items-center">
+                {/* Mobile Row 1 / Desktop Col 1 & 2: Enter Age + Muscle Change side by side */}
+                <div className="md:col-span-7 grid grid-cols-2 gap-3 items-center">
+                  {/* Col 1: Single Age Control with Stepper & Direct Entry */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="user-age-input"
+                      className="mono text-[10px] tracking-[0.12em] uppercase text-[#8A7993] mb-1 block cursor-pointer select-none font-medium"
                     >
-                      −
-                    </button>
-                    <input
-                      type="number"
-                      min="30"
-                      max="75"
-                      value={userAge}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        if (!isNaN(val)) setUserAge(Math.max(25, Math.min(80, val)));
-                      }}
-                      className="w-14 text-center text-xl font-light text-[#14091F] font-mono bg-transparent border-none focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setUserAge((a) => Math.min(65, a + 5))}
-                      className="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all text-base focus:outline-none cursor-pointer"
-                      title="Increase age"
-                      aria-label="Increase age"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* Col 2: Estimated Muscle Change */}
-                <div className="md:col-span-4 flex items-center gap-4 py-2 md:py-0 md:px-6">
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mut)' }}>
-                        Estimated Muscle Change
-                      </span>
-                      <span className="w-3.5 h-3.5 rounded-full border border-gray-400 text-[10px] flex items-center justify-center text-gray-500 font-serif" title="Sarcopenic volume decline from age 30 baseline">i</span>
+                      Enter Your Age
+                    </label>
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-white border border-[#E2DCD5] p-1 w-full max-w-[145px] shadow-sm select-none">
+                      <button
+                        type="button"
+                        onClick={() => setUserAge((a) => Math.max(25, a - 5))}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F5F2EB] hover:bg-[#EAE4D8] text-[#14091F] font-bold text-base sm:text-lg flex items-center justify-center active:scale-90 transition-all cursor-pointer select-none shrink-0"
+                        title="Decrease age by 5 years"
+                        aria-label="Decrease age by 5 years"
+                      >
+                        −
+                      </button>
+                      <div className="relative flex-1 flex items-center justify-center">
+                        <input
+                          id="user-age-input"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={2}
+                          value={userAgeInput}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, '');
+                            setUserAgeInput(val);
+                            if (val !== '') {
+                              const num = parseInt(val, 10);
+                              if (!isNaN(num) && num >= 10 && num <= 99) {
+                                setUserAge(Math.max(25, Math.min(80, num)));
+                              }
+                            }
+                          }}
+                          onBlur={() => {
+                            const num = parseInt(userAgeInput, 10);
+                            if (isNaN(num) || num < 25) {
+                              setUserAge(30);
+                              setUserAgeInput('30');
+                            } else if (num > 80) {
+                              setUserAge(80);
+                              setUserAgeInput('80');
+                            } else {
+                              setUserAge(num);
+                              setUserAgeInput(String(num));
+                            }
+                          }}
+                          aria-label="Your Age"
+                          className="w-12 h-7 sm:h-8 text-center text-lg sm:text-xl font-medium text-[#14091F] font-mono bg-[#FAF8F5] rounded-md border border-[#E5DFD5] hover:border-[#14091F]/40 focus:border-[#9333EA] focus:bg-white focus:ring-2 focus:ring-[#9333EA]/20 focus:outline-none select-text cursor-text transition-all"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setUserAge((a) => Math.min(80, a + 5))}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F5F2EB] hover:bg-[#EAE4D8] text-[#14091F] font-bold text-base sm:text-lg flex items-center justify-center active:scale-90 transition-all cursor-pointer select-none shrink-0"
+                        title="Increase age by 5 years"
+                        aria-label="Increase age by 5 years"
+                      >
+                        +
+                      </button>
                     </div>
-                    <div className="flex items-baseline gap-3">
-                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 200, letterSpacing: '-0.045em', lineHeight: 0.95, fontSize: 'clamp(2.2rem, 4vw, 3.4rem)', color: 'var(--fg)' }}>
+                  </div>
+
+                  {/* Col 2: Estimated Muscle Change */}
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mut)' }}>
+                        Muscle Change
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 200, letterSpacing: '-0.045em', lineHeight: 0.95, fontSize: 'clamp(1.6rem, 3.2vw, 3.2rem)', color: 'var(--fg)' }}>
                         {userAge <= 30
                           ? '0%'
                           : userAge <= 40
@@ -1493,18 +1729,18 @@ export default function GoProteenPage() {
                           ? `≈ ${Math.round(10 + ((userAge - 40) / 10) * 30)}%`
                           : `≈ ${Math.min(55, Math.round(40 + ((userAge - 50) / 10) * 10))}%`}
                       </span>
-                      <span style={{ fontSize: '12px', lineHeight: 1.4, color: 'var(--mut)', maxWidth: '20ch', fontWeight: 300 }}>
+                      <span style={{ fontSize: '10px', lineHeight: 1.3, color: 'var(--mut)', maxWidth: '18ch', fontWeight: 300 }}>
                         {userAge <= 30
-                          ? 'Baseline full muscular volume.'
-                          : 'Loss of muscle volume since age 30.'}
+                          ? 'Baseline volume.'
+                          : 'Loss since age 30.'}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Col 3: See Muscle Progression by Age Milestones */}
-                <div className="md:col-span-5 flex flex-col justify-center">
-                  <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mut)', marginBottom: '14px' }}>
+                <div className="md:col-span-5 flex flex-col justify-center mt-1 md:mt-0">
+                  <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mut)', marginBottom: '10px' }}>
                     See Muscle Progression by Age
                   </span>
                   <div className="relative w-full px-2">
@@ -1542,10 +1778,10 @@ export default function GoProteenPage() {
                                   : 'border-[#C8C2B7] bg-white'
                               }`}
                             />
-                            <span className={`text-xs mt-2 font-mono ${isSelected ? 'text-[#14091F] font-bold' : 'text-[#6B726C]'}`}>
+                            <span className={`text-[11px] sm:text-xs mt-1.5 font-mono ${isSelected ? 'text-[#14091F] font-bold' : 'text-[#6B726C]'}`}>
                               {m.label}
                             </span>
-                            <span className="text-[10px] text-[#9BA39D] leading-tight mt-0.5 font-mono">
+                            <span className="text-[9px] text-[#9BA39D] leading-tight mt-0.5 font-mono">
                               {m.sub}
                             </span>
                           </button>
@@ -1558,20 +1794,20 @@ export default function GoProteenPage() {
             </div>
 
             {/* Bottom Action Bar: Reset to Age 30 Action & Look Deeper */}
-            <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-3">
+            <div className="w-full flex flex-row items-center justify-between gap-3 mt-2 sm:mt-3">
               {/* Left: Reset to Age 30 Action */}
               <div className="chips" style={{ margin: 0 }}>
                 <button
                   type="button"
                   onClick={() => setUserAge(30)}
                   className={userAge === 30 ? 'on' : ''}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '11px', padding: '6px 14px' }}
                   title="Reset to Age 30 Baseline"
                 >
                   <svg className="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  <span>Reset to Age 30 (Baseline)</span>
+                  <span>Reset to Age 30</span>
                 </button>
               </div>
 
@@ -1583,9 +1819,9 @@ export default function GoProteenPage() {
                 >
                   <button
                     type="button"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '11px', padding: '6px 14px' }}
                   >
-                    <span>Look Deeper Inside Your Body</span>
+                    <span>Look Deeper</span>
                     <span aria-hidden="true">→</span>
                   </button>
                 </a>
@@ -1618,51 +1854,51 @@ export default function GoProteenPage() {
               {/* Left Column: Title, Subtitle, Audio */}
               <div className="lg:col-span-5 flex flex-col justify-center z-10">
                 {/* Category Tracker */}
-                <span className="mono r" style={{ marginBottom: '1vh', display: 'inline-block' }}>
+                <span className="mono r text-[10px] sm:text-xs font-mono tracking-widest uppercase text-[#8A7993] mb-1 block">
                   The cell response
                 </span>
 
                 {/* Main Headline */}
-                <h2 className="r" style={{ margin: '0.5vh 0 1.5vh', fontSize: 'clamp(2.2rem, 3.8vw, 3.5rem)', lineHeight: 1.02 }}>
+                <h2 className="r text-[1.4rem] sm:text-[2.1rem] lg:text-[2.9rem] font-light tracking-tight leading-[1.08] sm:leading-[1.02] text-[#14091F] mb-1.5 sm:mb-2">
                   The Hard-Of-<br />
                   Hearing Cells <span style={{ color: '#2D6A4F', fontStyle: 'italic', fontWeight: 300 }}>(Anabolic Resistance)</span>
                 </h2>
 
                 {/* Subtitle Paragraph */}
-                <p className="r" style={{ fontSize: 'clamp(0.95rem, 1.2vw, 1.05rem)', lineHeight: 1.55, color: 'var(--mut)', maxWidth: '44ch', marginBottom: '2.5vh', fontWeight: 300 }}>
+                <p className="r text-xs sm:text-sm text-[#5D5066] leading-relaxed max-w-[460px] mb-2 sm:mb-4 font-light">
                   As we age, our muscle cells become less responsive to protein signals — especially leucine. They don’t respond as strongly, so muscle rebuilding becomes less efficient.
                 </p>
 
                 {/* Audio Player Bar */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 mb-1 sm:mb-0">
                   <button
                     type="button"
                     onClick={toggleCellNarration}
-                    className="w-10 h-10 rounded-full bg-[#14091F] hover:bg-[#251535] text-white flex items-center justify-center transition-all duration-300 shadow-sm hover:scale-105 active:scale-95 group focus:outline-none cursor-pointer"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#14091F] hover:bg-[#251535] text-white flex items-center justify-center transition-all duration-300 shadow-sm hover:scale-105 active:scale-95 group focus:outline-none cursor-pointer shrink-0"
                     title={cellAudioPlaying ? 'Pause narration' : 'Hear the story'}
                     aria-label={cellAudioPlaying ? 'Pause narration' : 'Hear the story'}
                   >
                     {cellAudioPlaying ? (
-                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" viewBox="0 0 24 24">
                         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                       </svg>
                     ) : (
-                      <svg className="w-3.5 h-3.5 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current translate-x-0.5" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
                   </button>
-                  <span className="mono" style={{ textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.14em', color: 'var(--mut)' }}>
+                  <span className="mono" style={{ textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.12em', color: 'var(--mut)' }}>
                     Hear the story
                   </span>
-                  <div className="flex items-center gap-1 h-5 px-1">
+                  <div className="flex items-center gap-1 h-4 sm:h-5 px-1">
                     {[6, 12, 18, 9, 16, 22, 14, 18, 24, 11, 16, 7, 4].map((h, i) => (
                       <span
                         key={i}
                         className={`w-[2px] rounded-full bg-[#14091F] transition-all duration-200 ${
                           cellAudioPlaying ? `animate-eq-${(i % 5) + 1}` : 'opacity-35'
                         }`}
-                        style={{ height: cellAudioPlaying ? `${h}px` : `${Math.max(3, h * 0.45)}px` }}
+                        style={{ height: cellAudioPlaying ? `${Math.max(3, h * 0.7)}px` : `${Math.max(3, h * 0.35)}px` }}
                       />
                     ))}
                   </div>
@@ -1671,7 +1907,7 @@ export default function GoProteenPage() {
 
               {/* Right Column: Hero Interactive Fascicle with Draggable Leucine Protein */}
               <div className="lg:col-span-7 relative flex items-center justify-center">
-                <div className="relative w-full h-[330px] sm:h-[380px] lg:h-[410px] flex items-center justify-center">
+                <div className="relative w-full h-[210px] sm:h-[300px] lg:h-[390px] flex items-center justify-center my-1 sm:my-2 lg:my-0">
                   <CellResponseExperience
                     userAge={cellAge}
                     onAbsorb={() => {
@@ -1682,55 +1918,83 @@ export default function GoProteenPage() {
               </div>
             </div>
 
-            {/* Bottom Interactive Controls (Completely Borderless & Box-free) */}
-            <div className="w-full pt-2 pb-1">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
-                {/* Col 1: Single Age Control with Stepper & Direct Entry */}
-                <div className="md:col-span-3 flex flex-col">
-                  <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mut)', marginBottom: '8px' }}>
-                    Enter Your Age
-                  </span>
-                  <div className="inline-flex items-center justify-between rounded-full bg-white/80 p-1 w-36 shadow-xs">
-                    <button
-                      type="button"
-                      onClick={() => setCellAge((a) => Math.max(30, a - 5))}
-                      className="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all text-base focus:outline-none cursor-pointer"
-                      title="Decrease age"
-                      aria-label="Decrease age"
+            {/* Bottom Interactive Controls (Responsive & Compact) */}
+            <div className="w-full pt-1 sm:pt-2 pb-1">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-6 md:gap-8 items-center">
+                {/* Mobile Row 1 / Desktop Col 1 & 2: Enter Age + Response side by side */}
+                <div className="md:col-span-7 grid grid-cols-2 gap-3 items-center">
+                  {/* Col 1: Single Age Control with Stepper & Direct Entry */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="cell-age-input"
+                      className="mono text-[10px] tracking-[0.12em] uppercase text-[#8A7993] mb-1 block cursor-pointer select-none font-medium"
                     >
-                      −
-                    </button>
-                    <input
-                      type="number"
-                      min="30"
-                      max="75"
-                      value={cellAge}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        if (!isNaN(val)) setCellAge(Math.max(25, Math.min(80, val)));
-                      }}
-                      className="w-14 text-center text-xl font-light text-[#14091F] font-mono bg-transparent border-none focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setCellAge((a) => Math.min(65, a + 5))}
-                      className="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all text-base focus:outline-none cursor-pointer"
-                      title="Increase age"
-                      aria-label="Increase age"
-                    >
-                      +
-                    </button>
+                      Enter Your Age
+                    </label>
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-white border border-[#E2DCD5] p-1 w-full max-w-[145px] shadow-sm select-none">
+                      <button
+                        type="button"
+                        onClick={() => setCellAge((a) => Math.max(25, a - 5))}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F5F2EB] hover:bg-[#EAE4D8] text-[#14091F] font-bold text-base sm:text-lg flex items-center justify-center active:scale-90 transition-all cursor-pointer select-none shrink-0"
+                        title="Decrease age by 5 years"
+                        aria-label="Decrease age by 5 years"
+                      >
+                        −
+                      </button>
+                      <div className="relative flex-1 flex items-center justify-center">
+                        <input
+                          id="cell-age-input"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={2}
+                          value={cellAgeInput}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, '');
+                            setCellAgeInput(val);
+                            if (val !== '') {
+                              const num = parseInt(val, 10);
+                              if (!isNaN(num) && num >= 10 && num <= 99) {
+                                setCellAge(Math.max(25, Math.min(80, num)));
+                              }
+                            }
+                          }}
+                          onBlur={() => {
+                            const num = parseInt(cellAgeInput, 10);
+                            if (isNaN(num) || num < 25) {
+                              setCellAge(30);
+                              setCellAgeInput('30');
+                            } else if (num > 80) {
+                              setCellAge(80);
+                              setCellAgeInput('80');
+                            } else {
+                              setCellAge(num);
+                              setCellAgeInput(String(num));
+                            }
+                          }}
+                          aria-label="Your Age"
+                          className="w-12 h-7 sm:h-8 text-center text-lg sm:text-xl font-medium text-[#14091F] font-mono bg-[#FAF8F5] rounded-md border border-[#E5DFD5] hover:border-[#14091F]/40 focus:border-[#9333EA] focus:bg-white focus:ring-2 focus:ring-[#9333EA]/20 focus:outline-none select-text cursor-text transition-all"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCellAge((a) => Math.min(80, a + 5))}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F5F2EB] hover:bg-[#EAE4D8] text-[#14091F] font-bold text-base sm:text-lg flex items-center justify-center active:scale-90 transition-all cursor-pointer select-none shrink-0"
+                        title="Increase age by 5 years"
+                        aria-label="Increase age by 5 years"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Col 2: Cell Response Percentage */}
-                <div className="md:col-span-4 flex items-center gap-4 py-2 md:py-0 md:px-6">
-                  <div>
-                    <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mut)', display: 'block', marginBottom: '4px' }}>
+                  {/* Col 2: Cell Response Percentage */}
+                  <div className="flex flex-col">
+                    <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mut)', display: 'block', marginBottom: '4px' }}>
                       Cell Response
                     </span>
-                    <div className="flex items-baseline gap-3">
-                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 200, letterSpacing: '-0.045em', lineHeight: 0.95, fontSize: 'clamp(2.2rem, 4vw, 3.4rem)', color: 'var(--fg)' }}>
+                    <div className="flex items-baseline gap-2">
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 200, letterSpacing: '-0.045em', lineHeight: 0.95, fontSize: 'clamp(1.6rem, 3.2vw, 3.2rem)', color: 'var(--fg)' }}>
                         {cellAge <= 30
                           ? '100%'
                           : cellAge <= 40
@@ -1739,22 +2003,22 @@ export default function GoProteenPage() {
                           ? `≈ ${Math.round(75 - ((cellAge - 40) / 10) * 25)}%`
                           : `≈ ${Math.max(20, Math.round(50 - ((cellAge - 50) / 10) * 20))}%`}
                       </span>
-                      <span style={{ fontSize: '12px', lineHeight: 1.4, color: 'var(--mut)', maxWidth: '22ch', fontWeight: 300 }}>
+                      <span style={{ fontSize: '10px', lineHeight: 1.3, color: 'var(--mut)', maxWidth: '18ch', fontWeight: 300 }}>
                         {cellAge <= 30
-                          ? 'Muscle protein synthesis active.'
+                          ? 'Synthesis active.'
                           : cellAge <= 40
-                          ? 'Moderate response to standard protein.'
+                          ? 'Moderate response.'
                           : cellAge <= 50
-                          ? 'Blunted response (Anabolic resistance).'
-                          : 'Requires high-density leucine to activate.'}
+                          ? 'Blunted response.'
+                          : 'High leucine needed.'}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Col 3: Response Decreases with Age Timeline */}
-                <div className="md:col-span-5 flex flex-col justify-center">
-                  <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mut)', marginBottom: '14px' }}>
+                <div className="md:col-span-5 flex flex-col justify-center mt-1 md:mt-0">
+                  <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mut)', marginBottom: '10px' }}>
                     Response Decreases with Age
                   </span>
                   <div className="relative w-full px-2">
@@ -1792,10 +2056,10 @@ export default function GoProteenPage() {
                                   : 'border-[#C8C2B7] bg-white'
                               }`}
                             />
-                            <span className={`text-xs mt-2 font-mono ${isSelected ? 'text-[#14091F] font-bold' : 'text-[#6B726C]'}`}>
+                            <span className={`text-[11px] sm:text-xs mt-1.5 font-mono ${isSelected ? 'text-[#14091F] font-bold' : 'text-[#6B726C]'}`}>
                               {m.label}
                             </span>
-                            <span className="text-[10px] text-[#9BA39D] leading-tight mt-0.5 font-mono">
+                            <span className="text-[9px] text-[#9BA39D] leading-tight mt-0.5 font-mono">
                               {m.sub}
                             </span>
                           </button>
@@ -1808,7 +2072,7 @@ export default function GoProteenPage() {
             </div>
 
             {/* Bottom Action Bar: Reset to Age 30 Action & Look Deeper */}
-            <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-3">
+            <div className="w-full flex flex-row items-center justify-between gap-3 mt-2 sm:mt-3">
               {/* Left: Reset to Age 30 Action */}
               <div className="chips" style={{ margin: 0 }}>
                 <button
@@ -1818,7 +2082,7 @@ export default function GoProteenPage() {
                     setIsProteinBound(false);
                   }}
                   className={cellAge === 30 && !isProteinBound ? 'on' : ''}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '11px', padding: '6px 14px' }}
                   title="Reset to Age 30 Baseline"
                 >
                   <svg className="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -1836,7 +2100,7 @@ export default function GoProteenPage() {
                 >
                   <button
                     type="button"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '11px', padding: '6px 14px' }}
                   >
                     <span>Look Deeper</span>
                     <span aria-hidden="true">→</span>
@@ -1857,12 +2121,9 @@ export default function GoProteenPage() {
           style={{
             padding: 0,
             position: 'relative',
-            overflow: 'hidden',
-            backgroundColor: '#FDFBF7',
+            backgroundColor: 'transparent',
             zIndex: 10,
             minHeight: '100vh',
-            height: '100vh',
-            maxHeight: '100vh',
           }}
         >
           {/* Hidden Story for Global Narration */}
@@ -1913,7 +2174,7 @@ export default function GoProteenPage() {
         {/* Section 6: The repair kit */}
         <section
           id="rep"
-          data-bar="-1.25 .8 .4 .4 0 .25 0 0"
+          data-bar="-1.25 .8 .4 .15 0 .25 1 0"
           data-orb="1 0 .8 60 .55"
         >
           <span className="mono r">The repair kit</span>
@@ -1964,7 +2225,7 @@ export default function GoProteenPage() {
         {/* Section 6: Breakthrough Solution */}
         <section
           id="sol"
-          data-bar="1.25 .7 .45 .4 0 .3 0 0"
+          data-bar="1.25 .7 .45 .15 0 .3 1 0"
           data-orb="-1 0 .8 250 .55"
         >
           <span className="mono r">The breakthrough solution</span>
@@ -2031,7 +2292,7 @@ export default function GoProteenPage() {
         {/* Section 7: Meet GoProteen */}
         <section
           id="meet"
-          data-bar="0 -0.05 1.55 0 0 1 1 0"
+          data-bar="0 -0.05 1.55 0 0.1 1 1 0"
           data-orb="0 0 1.6 0 1"
           data-theme="v"
           style={{ alignItems: 'center', textAlign: 'center' }}
@@ -2076,14 +2337,15 @@ export default function GoProteenPage() {
         {/* Section 8: Anatomy */}
         <section
           id="anat"
-          data-bar="0 0 1.4 0 0 1 0 0"
+          data-bar="0 -0.015 1.16 -0.28 0.36 1 0 0"
           data-orb="0 0 .9 20 .4"
-          style={{ alignItems: 'center', textAlign: 'center' }}
+          className="anat-section"
         >
-          <span className="mono r">Anatomy</span>
-          <h2 className="r" style={{ margin: '2vh auto' }}>
-            Pull it apart.
-          </h2>
+          <div className="anat-header r">
+            <span className="mono">Anatomy</span>
+            <h2>Pull it apart.</h2>
+          </div>
+
           <div className="anat r">
             <div className="col">
               <button data-i="0">Crunchy coat</button>
@@ -2095,25 +2357,27 @@ export default function GoProteenPage() {
               <button data-i="3">Date base</button>
             </div>
           </div>
-          <input
-            type="range"
-            id="exr"
-            min="0"
-            max="100"
-            defaultValue="0"
-            aria-label="Explode"
-            style={{ margin: '5vh auto 0' }}
-          />
-          <p className="info" id="info">
-            Slide to explode the bar, or tap a layer.
-          </p>
+
+          <div className="anat-bottom r">
+            <input
+              type="range"
+              id="exr"
+              min="0"
+              max="100"
+              defaultValue="0"
+              aria-label="Explode"
+            />
+            <p className="info" id="info">
+              Drag to rotate · slide to explode or tap a layer.
+            </p>
+          </div>
         </section>
         <div className="sp"></div>
 
         {/* Section 9: Gut Synbiotic */}
         <section
           id="gut"
-          data-bar="1.25 .6 .4 .4 0 .2 0 0"
+          data-bar="1.25 .6 .4 .15 0 .2 1 0"
           data-orb="-1 0 .8 90 .5"
         >
           <canvas id="bb"></canvas>
@@ -2159,7 +2423,7 @@ export default function GoProteenPage() {
 
         {/* Section 10: Clean-label guarantee */}
         <section
-          data-bar="0 0 .4 0 0 .12 0 0"
+          data-bar="0 0 .4 0 0 .12 1 0"
           data-orb="0 0 1 0 .6"
           style={{ paddingLeft: 0, paddingRight: 0 }}
         >
@@ -2237,7 +2501,7 @@ export default function GoProteenPage() {
         {/* Section 11: Who it's for */}
         <section
           id="who"
-          data-bar="0 0 .3 0 0 0 0 0"
+          data-bar="0 0 .3 0 0 0 1 0"
           data-orb="0 0 .8 0 .5"
           style={{ paddingRight: 0 }}
         >
@@ -2309,7 +2573,7 @@ export default function GoProteenPage() {
 
         {/* Section 12: Closing / First Bite */}
         <section
-          data-bar="0 0.02 1.35 0 0 1 0 0"
+          data-bar="0 0.02 1.35 0 0 1 1 0"
           data-orb="0 0 1.3 330 .8"
           data-theme="v"
           style={{ alignItems: 'center', textAlign: 'center' }}

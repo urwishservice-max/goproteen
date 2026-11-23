@@ -73,7 +73,15 @@ export default function GutSynbioticSection() {
     container.addEventListener('pointerdown', handlePointerDown);
     window.addEventListener('resize', handleResize);
 
+    let isVisible = true;
+    let isLooping = false;
+
     const render = () => {
+      if (!isVisible) {
+        isLooping = false;
+        return;
+      }
+      isLooping = true;
       ctx.clearRect(0, 0, width, height);
 
       bubbles.forEach((b) => {
@@ -130,9 +138,30 @@ export default function GutSynbioticSection() {
       animId = requestAnimationFrame(render);
     };
 
-    animId = requestAnimationFrame(render);
+    const startAnimation = () => {
+      if (!isLooping) {
+        isLooping = true;
+        animId = requestAnimationFrame(render);
+      }
+    };
+
+    startAnimation();
+
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (isVisible) {
+            startAnimation();
+          }
+        });
+      },
+      { threshold: 0.01 }
+    );
+    visibilityObserver.observe(container);
 
     return () => {
+      visibilityObserver.disconnect();
       cancelAnimationFrame(animId);
       container.removeEventListener('pointermove', handlePointerMove);
       container.removeEventListener('pointerdown', handlePointerDown);

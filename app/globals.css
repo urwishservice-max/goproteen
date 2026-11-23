@@ -128,11 +128,19 @@ body.v {
 #crash {
   position: relative !important;
   z-index: 10 !important;
-  background-color: #FDFBF7 !important;
+  background-color: transparent !important;
+}
+
+#bone {
+  position: relative !important;
+  z-index: 10 !important;
+  background-color: transparent !important;
 }
 
 body.in-crash-section #c,
-body.in-crash-section #orb {
+body.in-crash-section #orb,
+body.in-bone-section #c,
+body.in-bone-section #orb {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -392,43 +400,119 @@ svg.cv {
   overflow: visible;
 }
 
+/* Section 8: Anatomy Exploded View */
+.anat-section {
+  min-height: 100vh;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  text-align: center;
+  padding: 6vh 6vw 5vh !important;
+  position: relative;
+}
+
+.anat-header {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.anat-header h2 {
+  margin: 0.6vh auto 0;
+  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+}
+
 .anat {
   display: grid;
-  grid-template-columns: 1fr minmax(200px, 36vw) 1fr;
+  grid-template-columns: 1fr minmax(320px, 48vw) 1fr;
   gap: 2vw;
   align-items: center;
-  margin-top: 4vh;
+  width: 100%;
+  max-width: 1240px;
+  min-height: 44vh;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.anat .mid {
+  min-height: 44vh;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.anat .mid:active {
+  cursor: grabbing;
 }
 
 .anat .col {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   justify-items: start;
 }
 
-.anat .col:first-child { justify-items: end; }
+.anat .col:first-child {
+  justify-items: end;
+}
 
 .anat button {
-  font: 300 14px 'Inter', sans-serif;
-  padding: 12px 22px;
+  font: 400 14px 'Inter', -apple-system, sans-serif;
+  padding: 12px 24px;
   border-radius: 99px;
   border: 1px solid var(--line);
   background: var(--glass);
   color: var(--fg);
   cursor: pointer;
-  transition: all .3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.anat button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 .anat button.on {
-  background: var(--fg);
-  color: var(--bg);
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.2);
 }
 
-.info {
-  min-height: 3.4em;
-  margin: 3vh auto 0;
-  max-width: 44ch;
+.anat-bottom {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.anat-bottom input[type=range] {
+  width: 100%;
+  max-width: 420px;
+  height: 28px;
+  cursor: pointer;
+  accent-color: #ff8a2b;
+}
+
+.anat-bottom .info {
+  margin: 1.5vh auto 0;
+  min-height: 2.8em;
+  max-width: 46ch;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--fg);
+  opacity: 0.85;
 }
 
 .stats {
@@ -882,13 +966,90 @@ footer p {
 @media (max-width: 800px) {
   #dots { display: none; }
   .cmp { height: 340px; }
-  section { padding: 16vh 7vw; }
-  .anat { grid-template-columns: 1fr; }
-  .anat .mid { order: -1; height: 30vh; }
-  .anat .col, .anat .col:first-child { justify-items: start; display: flex; flex-wrap: wrap; }
+  section:not(#bone):not(#crash):not(#clean-label-guarantee):not(.sarcopenia-section):not(.cell-response-section) { padding: 16vh 7vw; }
+  .anat-section { padding: 10vh 5vw 6vh !important; }
+  .anat { grid-template-columns: 1fr; min-height: auto; gap: 16px; }
+  .anat .mid { order: 0; min-height: 28vh; height: 28vh; }
+  .anat .col:first-child { order: -1; justify-items: center; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .anat .col:last-child { order: 1; justify-items: center; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
   .pills .pill { font-size: 11px; padding: 7px 13px; }
   .cells { grid-template-columns: repeat(8, 1fr); gap: 10px; }
   .cells i:nth-child(n+41) { display: none; }
+}
+
+/* Mobile & Tablet Responsive Layout Improvements (< 1024px) */
+@media (max-width: 1023px) {
+  #bone,
+  #bone.fading-foundation-section,
+  #bone-experience-section,
+  .sarcopenia-section,
+  .cell-response-section {
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .sarcopenia-section,
+  .cell-response-section {
+    padding-top: calc(85px + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 2.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  #bone {
+    padding: 0 !important;
+  }
+
+  #crash {
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  #clean-label-guarantee {
+    overflow: visible !important;
+  }
+
+  /* Prevent horizontal overflow and text clipping on mobile */
+  .chips {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Make sure sliders and controls fit narrow mobile widths */
+  input[type="range"] {
+    max-width: 100% !important;
+  }
+}
+
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+  /* Clamp massive background blurs to prevent mobile GPU compositor stalls during scroll */
+  [class*="blur-[7"],
+  [class*="blur-[8"],
+  [class*="blur-[9"],
+  [class*="blur-[1"] {
+    filter: blur(20px) !important;
+  }
+
+  [class*="backdrop-blur-"] {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  #orb {
+    filter: blur(18px) !important;
+    animation-duration: 60s !important;
+  }
+
+  /* Hardware acceleration for mobile canvases and fixed containers */
+  #c,
+  canvas {
+    transform: translateZ(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

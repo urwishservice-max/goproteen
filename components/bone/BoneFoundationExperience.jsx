@@ -186,7 +186,7 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
   return (
     <div
       id="bone-experience-section"
-      className="relative w-full h-screen max-h-screen min-h-screen flex flex-col justify-between pt-10 sm:pt-12 pb-3 sm:pb-4 px-4 sm:px-8 lg:px-12 select-none overflow-hidden bg-[#FDFBF7] z-10"
+      className="relative w-full min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-6 sm:pt-10 lg:pt-12 pb-4 px-4 sm:px-8 lg:px-12 select-none overflow-visible lg:overflow-hidden bg-transparent z-10"
     >
       {/* Main Experience Stage */}
       <div className="w-full max-w-[1400px] mx-auto my-auto flex-1 flex flex-col justify-center z-10 py-1 overflow-visible">
@@ -197,7 +197,7 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
             <div className="lg:col-span-4 flex flex-col justify-center space-y-3">
               <div>
                 <h2
-                  className="text-3xl sm:text-4xl lg:text-[42px] font-light text-[#2A0E3D] tracking-tight leading-[1.05]"
+                  className="text-2xl sm:text-4xl lg:text-[42px] font-light text-[#2A0E3D] tracking-tight leading-[1.05]"
                   style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 >
                   The Fading<br />
@@ -249,7 +249,7 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
             </div>
 
             {/* Center Column: Interactive 3D Z-Anatomy Skeleton (Fitted Cleanly without Off-Screen Clipping) */}
-            <div className="lg:col-span-4 flex items-center justify-center relative w-full h-[460px] sm:h-[500px] lg:h-[540px] xl:h-[580px] max-h-[72vh] overflow-visible">
+            <div className="lg:col-span-4 flex items-center justify-center relative w-full h-[280px] sm:h-[380px] lg:h-[540px] xl:h-[580px] max-h-[72vh] overflow-visible my-2 lg:my-0">
               <div className="w-full h-full relative">
                 <InteractiveSkeleton
                   selectedJoint={selectedJoint}
@@ -258,22 +258,22 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
               </div>
             </div>
 
-            {/* Middle Joint Pills & Right Side Feature Card */}
-            <div className="lg:col-span-4 flex items-center gap-3 sm:gap-4">
-              {/* Vertical Stack of 3 Joint Selector Pills */}
-              <div className="flex flex-col gap-2.5 shrink-0 z-20">
+            {/* Middle Joint Pills & Right Side Editorial Panel */}
+            <div className="lg:col-span-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-2 sm:mt-0">
+              {/* Responsive Stack of 3 Joint Selector Pills (No icons, clean minimal pills) */}
+              <div className="flex flex-row flex-wrap sm:flex-col gap-2 shrink-0 z-20">
                 {/* Spine Pill */}
                 <button
                   type="button"
                   onClick={() => handleSelectJoint('spine')}
                   aria-label="Explore Spine"
-                  className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl transition-all duration-300 cursor-pointer ${selectedJoint === 'spine'
-                    ? 'bg-gradient-to-r from-rose-100/90 to-pink-100/90 border border-rose-300 text-[#371B48] shadow-md scale-105 ring-2 ring-rose-200/50'
-                    : 'bg-white/70 hover:bg-white text-stone-600 border border-stone-200/60 shadow-2xs'
-                    }`}
+                  className={`px-4 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 cursor-pointer ${
+                    selectedJoint === 'spine'
+                      ? 'bg-[#14091F] text-white shadow-sm'
+                      : 'bg-white/80 hover:bg-white text-[#14091F] border border-[#E5DFD7]'
+                  }`}
                 >
-                  <img src="/images/clean_icon_spine.png" alt="Spine" className="w-5 h-6 object-contain" />
-                  <span className="text-xs font-semibold tracking-wide">Spine</span>
+                  Spine
                 </button>
 
                 {/* Hip Pill */}
@@ -281,13 +281,13 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
                   type="button"
                   onClick={() => handleSelectJoint('hip')}
                   aria-label="Explore Hip"
-                  className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl transition-all duration-300 cursor-pointer ${selectedJoint === 'hip'
-                    ? 'bg-gradient-to-r from-rose-100/90 to-pink-100/90 border border-rose-300 text-[#371B48] shadow-md scale-105 ring-2 ring-rose-200/50'
-                    : 'bg-white/70 hover:bg-white text-stone-600 border border-stone-200/60 shadow-2xs'
-                    }`}
+                  className={`px-4 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 cursor-pointer ${
+                    selectedJoint === 'hip'
+                      ? 'bg-[#14091F] text-white shadow-sm'
+                      : 'bg-white/80 hover:bg-white text-[#14091F] border border-[#E5DFD7]'
+                  }`}
                 >
-                  <img src="/images/clean_icon_hip.png" alt="Hip" className="w-5 h-6 object-contain" />
-                  <span className="text-xs font-semibold tracking-wide">Hip</span>
+                  Hip
                 </button>
 
                 {/* Knee Pill */}
@@ -295,81 +295,52 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
                   type="button"
                   onClick={() => handleSelectJoint('knee')}
                   aria-label="Explore Knee"
-                  className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl transition-all duration-300 cursor-pointer ${selectedJoint === 'knee'
-                    ? 'bg-gradient-to-r from-rose-100/90 to-pink-100/90 border border-rose-300 text-[#371B48] shadow-md scale-105 ring-2 ring-rose-200/50'
-                    : 'bg-white/70 hover:bg-white text-stone-600 border border-stone-200/60 shadow-2xs'
-                    }`}
+                  className={`px-4 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 cursor-pointer ${
+                    selectedJoint === 'knee'
+                      ? 'bg-[#14091F] text-white shadow-sm'
+                      : 'bg-white/80 hover:bg-white text-[#14091F] border border-[#E5DFD7]'
+                  }`}
                 >
-                  <img src="/images/clean_icon_knee.png" alt="Knee" className="w-5 h-6 object-contain" />
-                  <span className="text-xs font-semibold tracking-wide">Knee</span>
+                  Knee
                 </button>
               </div>
 
-              {/* Right Side Glassmorphic Feature Card */}
+              {/* Editorial Info (Clean, open layout without background boxes) */}
               {joint ? (
-                <div className="w-full rounded-3xl bg-white/85 backdrop-blur-md border border-white p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 sm:gap-4 transition-all duration-300">
-                  {/* Left part: Title & Description */}
-                  <div className="space-y-1.5 sm:space-y-2 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-base sm:text-lg font-bold text-[#14091F] tracking-tight">
-                        {joint.title}
-                      </h4>
-                      {secondsRemaining !== null && (
-                        <span className="text-[9px] font-mono text-stone-400 bg-stone-100/80 px-1.5 py-0.5 rounded-md shrink-0">
-                          auto-resets {secondsRemaining}s
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-stone-600 leading-relaxed font-light">
-                      {joint.desc}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectJoint(null)}
-                      className="text-[10px] font-mono text-[#8A2855] hover:underline cursor-pointer block pt-0.5"
-                    >
-                      ← Return to overview
-                    </button>
-                  </div>
-
-                  {/* Right part: Anatomical Render Graphic */}
-                  <div className="relative w-24 sm:w-28 h-32 sm:h-36 shrink-0 flex items-center justify-center overflow-hidden rounded-2xl">
-                    {selectedJoint === 'knee' ? (
-                      <img
-                        src="/images/knee_joint_graphic.png"
-                        alt="Knee joint anatomical cutaway showing trabecular honeycomb bone"
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      /* Stylized anatomical visual for spine and hip */
-                      <div className="w-full h-full bg-gradient-to-b from-rose-50 to-pink-50 flex items-center justify-center p-2 rounded-2xl border border-rose-100">
-                        <img
-                          src={joint.icon}
-                          alt={joint.name}
-                          className="w-14 h-20 object-contain drop-shadow-sm"
-                        />
-                      </div>
+                <div className="space-y-1.5 flex-1 transition-all duration-300">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-base sm:text-lg font-light text-[#14091F] tracking-tight">
+                      {joint.title}
+                    </h4>
+                    {secondsRemaining !== null && (
+                      <span className="text-[9px] font-mono text-[#8A7993]">
+                        auto-resets {secondsRemaining}s
+                      </span>
                     )}
                   </div>
+                  <p className="text-xs text-[#5D5066] leading-relaxed font-light">
+                    {joint.desc}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectJoint(null)}
+                    className="text-[10px] font-mono uppercase tracking-wider text-[#9333EA] hover:underline cursor-pointer block pt-1"
+                  >
+                    ← Return to overview
+                  </button>
                 </div>
               ) : (
-                /* Starting State: Unselected neutral prompt */
-                <div className="w-full rounded-3xl bg-white/70 backdrop-blur-md border border-white/80 p-4 sm:p-5 shadow-sm flex items-center justify-between gap-3 sm:gap-4 transition-all duration-300">
-                  <div className="space-y-1.5 flex-1">
-                    <span className="font-mono text-[10px] tracking-wider text-[#8A2855] font-bold uppercase">
-                      Interactive Anatomy
-                    </span>
-                    <h4 className="text-base sm:text-lg font-bold text-[#14091F] tracking-tight">
-                      Key Joint Vulnerabilities
-                    </h4>
-                    <p className="text-[11px] sm:text-xs text-stone-600 leading-relaxed font-light">
-                      Select Spine, Hip, or Knee to inspect the primary areas where bone density decline causes morning stiffness.
-                    </p>
-                  </div>
-                  <div className="w-20 h-24 shrink-0 flex flex-col items-center justify-center rounded-2xl bg-gradient-to-b from-rose-50/70 to-pink-50/70 border border-rose-100/70 p-2 text-center">
-                    <span className="text-2xl mb-1">🦴</span>
-                    <span className="text-[9px] font-mono font-medium text-[#8A2855]">Tap to inspect</span>
-                  </div>
+                /* Starting State: Clean text without cards or boxes */
+                <div className="space-y-1.5 flex-1 transition-all duration-300">
+                  <span className="font-mono text-[10px] tracking-widest text-[#8A7993] uppercase block">
+                    Interactive Anatomy
+                  </span>
+                  <h4 className="text-base sm:text-lg font-light text-[#14091F] tracking-tight">
+                    Key Joint Vulnerabilities
+                  </h4>
+                  <p className="text-xs text-[#5D5066] leading-relaxed font-light">
+                    Select Spine, Hip, or Knee to inspect the primary areas where bone density decline causes morning stiffness.
+                  </p>
                 </div>
               )}
             </div>
@@ -409,24 +380,24 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
         )}
       </div>
 
-      {/* Bottom Timeline Stepper Bar (Exact match to reference mockup) */}
-      <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between pt-2 pb-1.5 border-t border-stone-200/50 z-20 select-none">
+      {/* Bottom Timeline Stepper Bar */}
+      <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between pt-3 pb-2 border-t border-stone-200/50 z-20 select-none gap-2">
         {/* Left: Back button */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center">
           <button
             type="button"
             disabled={activeStep === 0}
             onClick={() => goToStep(Math.max(0, activeStep - 1))}
-            className="w-10 h-10 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95 cursor-pointer"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95 cursor-pointer shrink-0"
             title="Previous step"
             aria-label="Previous step"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
         {/* Center: 4-Step Interactive Timeline Stepper */}
-        <div className="relative flex items-center gap-8 sm:gap-14">
+        <div className="relative flex items-center gap-3 sm:gap-8 md:gap-14 flex-1 justify-center max-w-[500px]">
           {/* Base inactive gray track line */}
           <div className="absolute top-[9px] left-3 right-3 h-[2px] bg-stone-200/90 -z-0" />
 
@@ -466,7 +437,7 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
 
                 {/* Step Label */}
                 <span
-                  className={`text-[11px] sm:text-xs font-mono tracking-wider transition-colors duration-200 ${
+                  className={`text-[9px] sm:text-xs font-mono tracking-wider transition-colors duration-200 text-center max-w-[65px] sm:max-w-none truncate sm:whitespace-normal ${
                     isActive
                       ? 'font-bold text-[#14091F]'
                       : 'text-[#5D5066] group-hover:text-[#14091F]'
@@ -485,21 +456,21 @@ export default function BoneFoundationExperience({ initialStep = 0 }) {
             <button
               type="button"
               onClick={() => goToStep(activeStep + 1)}
-              className="w-10 h-10 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition-all active:scale-95 cursor-pointer"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition-all active:scale-95 cursor-pointer shrink-0"
               title="Next step"
               aria-label="Next step"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           ) : (
             <a href="#crash" style={{ textDecoration: 'none' }}>
               <button
                 type="button"
-                className="w-10 h-10 rounded-full bg-[#14091F] shadow-sm flex items-center justify-center text-white hover:bg-[#251535] transition-all active:scale-95 cursor-pointer"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#14091F] shadow-sm flex items-center justify-center text-white hover:bg-[#251535] transition-all active:scale-95 cursor-pointer shrink-0"
                 title="Next section: The Afternoon Crash"
                 aria-label="Next section"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </a>
           )}

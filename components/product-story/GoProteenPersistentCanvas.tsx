@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { createGoProteenProductModel, ProductModelHandle } from './GoProteenProductModel';
@@ -20,7 +20,7 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
   ({ className = '', onLoaded }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [isInView, setIsInView] = useState(true);
+    const isInViewRef = useRef(true);
 
     // Target and current transform for the ONE persistent model
     const stateRef = useRef({
@@ -44,38 +44,48 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
       },
     }));
 
-    // Pause WebGL rendering when this section is offscreen
+    const startLoopRef = useRef<(() => void) | null>(null);
+    const isLoopingRef = useRef(false);
+
+    // Pause WebGL rendering loop when this section is offscreen to save mobile GPU & battery
     useEffect(() => {
       const container = containerRef.current;
-      if (!container) return;
+      if (!container || typeof IntersectionObserver === 'undefined') return;
 
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            setIsInView(entry.isIntersecting);
+            isInViewRef.current = entry.isIntersecting;
+            if (entry.isIntersecting && !isLoopingRef.current && startLoopRef.current) {
+              startLoopRef.current();
+            }
           });
         },
-        { rootMargin: '200px 0px', threshold: 0.01 }
+        { rootMargin: '100px 0px', threshold: 0.001 }
       );
 
       observer.observe(container);
       return () => observer.disconnect();
     }, []);
 
-    // Initialize the single Three.js Canvas and product instance
+    // Initialize the single persistent Three.js Canvas and product instance (mounts ONCE)
     useEffect(() => {
       const canvas = canvasRef.current;
       const container = containerRef.current;
       if (!canvas || !container) return;
 
+      const getWidth = () => container.clientWidth || window.innerWidth || 1280;
+      const getHeight = () => container.clientHeight || window.innerHeight || 800;
+
+      const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 800 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
       const renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: true,
-        powerPreference: 'high-performance',
+        antialias: !isMobile,
+        powerPreference: isMobile ? 'default' : 'high-performance',
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(container.clientWidth, container.clientHeight, false);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5));
+      renderer.setSize(getWidth(), getHeight(), false);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.35;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -86,14 +96,14 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
 
       const camera = new THREE.PerspectiveCamera(
         32,
-        container.clientWidth / container.clientHeight,
+        getWidth() / getHeight(),
         0.1,
         50
       );
       camera.position.set(0, 0, 5.0);
 
       // Studio Lighting
-      scene.add(new THREE.AmbientLight(0xffffff, 1.3));
+      scene.add(new THREE.AmbientLight(0xffffff, 1.4));
       scene.add(new THREE.HemisphereLight(0xffffff, 0x4a1d75, 1.1));
 
       const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
@@ -118,22 +128,27 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
       // Resize listener
       const handleResize = () => {
         if (!container || !renderer || !camera) return;
-        const w = container.clientWidth;
-        const h = container.clientHeight;
+        const w = getWidth();
+        const h = getHeight();
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h, false);
       };
       window.addEventListener('resize', handleResize);
+      handleResize();
 
-      // Main 60fps render loop
+      // Main render loop with complete offscreen sleep
       let animId = 0;
       const clock = new THREE.Clock();
 
       const animate = () => {
-        animId = requestAnimationFrame(animate);
+        if (!isInViewRef.current) {
+          isLoopingRef.current = false;
+          return; // Stop RAF loop completely when offscreen
+        }
 
-        if (!isInView) return; // Skip work when offscreen
+        isLoopingRef.current = true;
+        animId = requestAnimationFrame(animate);
 
         const elapsed = clock.getElapsedTime();
         const s = stateRef.current;
@@ -160,7 +175,7 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
         const idleRot = Math.sin(elapsed * 0.7) * 0.05;
         const idleFloat = Math.sin(elapsed * 1.4) * 0.04;
 
-        const w = container.clientWidth || 1280;
+        const w = getWidth();
         const xFactor = Math.min(1.0, Math.max(0.7, w / 1280));
         const finalX = s.currentPose.x * xFactor;
 
@@ -178,16 +193,24 @@ const GoProteenPersistentCanvas = forwardRef<PersistentCanvasHandle, GoProteenPe
         renderer.render(scene, camera);
       };
 
+      startLoopRef.current = () => {
+        if (!isLoopingRef.current) {
+          isLoopingRef.current = true;
+          animId = requestAnimationFrame(animate);
+        }
+      };
+
       animate();
 
       return () => {
+        startLoopRef.current = null;
         cancelAnimationFrame(animId);
         window.removeEventListener('resize', handleResize);
         modelHandle.dispose();
         pmrem.dispose();
         renderer.dispose();
       };
-    }, [isInView, onLoaded]);
+    }, []); // Run ONCE on mount, clean up on unmount
 
     return (
       <div

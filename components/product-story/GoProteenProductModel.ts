@@ -4,15 +4,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 export interface ProductModelHandle {
   rootGroup: THREE.Group;
   wrapperMesh: THREE.Mesh | null;
-  innerMesh: THREE.Mesh | null;
+  innerMesh: THREE.Object3D | null;
   dispose: () => void;
 }
 
-let cachedGltf: any = null;
-let gltfPromise: Promise<any> | null = null;
+let masterScene: THREE.Group | null = null;
+let gltfPromise: Promise<THREE.Group | null> | null = null;
 
-function loadSharedGLTF(): Promise<any> {
-  if (cachedGltf) return Promise.resolve(cachedGltf);
+function loadSharedScene(): Promise<THREE.Group | null> {
+  if (masterScene) return Promise.resolve(masterScene);
   if (gltfPromise) return gltfPromise;
 
   gltfPromise = new Promise((resolve) => {
@@ -20,8 +20,8 @@ function loadSharedGLTF(): Promise<any> {
     loader.load(
       '/models/GoProTeen_model.glb',
       (gltf) => {
-        cachedGltf = gltf;
-        resolve(gltf);
+        masterScene = gltf.scene;
+        resolve(gltf.scene);
       },
       undefined,
       (err) => {
@@ -61,7 +61,7 @@ export function createGoProteenProductModel(
   bumpMap.wrapS = bumpMap.wrapT = THREE.RepeatWrapping;
   bumpMap.repeat.set(3, 1);
 
-  // Procedural Fallback Mesh (visible until GLTF finishes)
+  // Procedural Fallback Mesh (guaranteed to render immediately so 3D model is NEVER missing)
   const procGroup = new THREE.Group();
   const chocMat = new THREE.MeshStandardMaterial({
     color: 0x3b1d12,
@@ -70,7 +70,7 @@ export function createGoProteenProductModel(
     bumpMap,
     bumpScale: 1.2,
   });
-  const procCore = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.18, 0.4), chocMat);
+  const procCore = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.22, 0.45), chocMat);
   procGroup.add(procCore);
 
   const wCanvas = document.createElement('canvas');
@@ -96,65 +96,83 @@ export function createGoProteenProductModel(
     roughness: 0.28,
     metalness: 0.05,
   });
-  const procWrap = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.19, 0.42), wrapMat);
+  const procWrap = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.23, 0.47), wrapMat);
   procGroup.add(procWrap);
   rootGroup.add(procGroup);
 
   let wrapperMesh: THREE.Mesh | null = null;
-  let innerMesh: THREE.Mesh | null = null;
+  let innerMesh: THREE.Object3D | null = null;
   let isDisposed = false;
 
-  loadSharedGLTF().then((gltf) => {
+  loadSharedScene().then((master) => {
     if (isDisposed) return;
-    if (gltf && gltf.scene) {
-      gltf.scene.traverse((child: any) => {
+    if (master) {
+      // CLONE the master scene so cached master nodes are NEVER reparented or stripped!
+      const sceneClone = master.clone(true);
+
+      // Scale the entire cloned model consistently
+      const scaleFactor = 10.5;
+      sceneClone.scale.setScalar(scaleFactor);
+
+      // Enhance all meshes in the scene
+      sceneClone.traverse((child: any) => {
         if (child.isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
-          if (
-            child.name.includes('Wrapper') ||
-            child.material?.name?.includes('Print') ||
-            child.name === 'GoProTeen_Main_Wrapper'
-          ) {
+
+          const mName = child.material?.name || '';
+          const oName = child.name || '';
+
+          if (oName.includes('Wrapper') || mName.includes('Print')) {
             wrapperMesh = child;
+            if (child.material) {
+              const mat = child.material as THREE.MeshStandardMaterial;
+              mat.transparent = false;
+              mat.opacity = 1.0;
+              mat.roughness = 0.26;
+              mat.metalness = 0.04;
+              mat.envMapIntensity = 1.3;
+              mat.needsUpdate = true;
+            }
           } else if (
-            child.name.includes('Bar') ||
-            child.material?.name?.includes('Chocolate') ||
-            child.name === 'GoProTeen_Inner_Chocolate_Bar'
+            oName.includes('CHOCOLATE_SHELL') ||
+            mName.includes('CHOCOLATE')
           ) {
-            innerMesh = child;
+            if (child.material) {
+              const mat = child.material as THREE.MeshStandardMaterial;
+              mat.roughness = 0.28;
+              mat.metalness = 0.02;
+              mat.envMapIntensity = 1.1;
+              mat.needsUpdate = true;
+            }
+          } else if (oName.includes('PROTEIN') || mName.includes('PROTEIN')) {
+            if (child.material) {
+              const mat = child.material as THREE.MeshStandardMaterial;
+              mat.roughness = 0.65;
+              mat.bumpMap = bumpMap;
+              mat.bumpScale = 1.0;
+              mat.needsUpdate = true;
+            }
           }
         }
       });
 
-      // Refined scaleFactor to keep model sleek and prevent text collision
-      const scaleFactor = 10.5;
+      // Locate inside bar assembly
+      innerMesh =
+        sceneClone.getObjectByName('GP_EXPLODE_CONTROLLER') ||
+        sceneClone.getObjectByName('GP_LAYER_CORE') ||
+        sceneClone.getObjectByName('GP_PROTEIN_NUT_CORE');
 
-      if (wrapperMesh) {
-        (wrapperMesh as THREE.Mesh).scale.setScalar(scaleFactor);
-        const wMat = (wrapperMesh as THREE.Mesh).material as THREE.MeshStandardMaterial;
-        if (wMat) {
-          wMat.roughness = 0.26;
-          wMat.metalness = 0.04;
-          wMat.envMapIntensity = 1.3;
-          wMat.needsUpdate = true;
-        }
-        rootGroup.add(wrapperMesh);
-      }
-
+      // The product story flow showcases the pristine packaged product:
+      // Hide inner bar assembly so it never clips, protrudes, or shows through the wrapper
       if (innerMesh) {
-        (innerMesh as THREE.Mesh).scale.setScalar(scaleFactor);
-        const bMat = (innerMesh as THREE.Mesh).material as THREE.MeshStandardMaterial;
-        if (bMat) {
-          bMat.bumpMap = bumpMap;
-          bMat.bumpScale = 1.2;
-          bMat.roughness = 0.38;
-          bMat.envMapIntensity = 0.8;
-          bMat.needsUpdate = true;
-        }
-        rootGroup.add(innerMesh);
+        innerMesh.visible = false;
       }
 
+      // Add complete high-fidelity model to root group
+      rootGroup.add(sceneClone);
+
+      // Hide procedural fallback geometry now that GLTF has loaded
       procGroup.visible = false;
     }
 

@@ -8,16 +8,16 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 // Global singleton cache for GLTF model to prevent redundant network fetches
 let cachedModelData: {
   wrapperMesh: THREE.Mesh | null;
-  innerMesh: THREE.Mesh | null;
+  innerMesh: THREE.Object3D | null;
 } | null = null;
 let modelLoadingPromise: Promise<{
   wrapperMesh: THREE.Mesh | null;
-  innerMesh: THREE.Mesh | null;
+  innerMesh: THREE.Object3D | null;
 }> | null = null;
 
 function loadSharedModel(): Promise<{
   wrapperMesh: THREE.Mesh | null;
-  innerMesh: THREE.Mesh | null;
+  innerMesh: THREE.Object3D | null;
 }> {
   if (cachedModelData) return Promise.resolve(cachedModelData);
   if (modelLoadingPromise) return modelLoadingPromise;
@@ -27,28 +27,8 @@ function loadSharedModel(): Promise<{
     loader.load(
       '/models/GoProTeen_model.glb',
       (gltf) => {
-        let foundWrapper: THREE.Mesh | null = null;
-        let foundInner: THREE.Mesh | null = null;
-
-        gltf.scene.traverse((child: any) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            if (
-              child.name.includes('Wrapper') ||
-              child.material?.name?.includes('Print') ||
-              child.name === 'GoProTeen_Main_Wrapper'
-            ) {
-              foundWrapper = child;
-            } else if (
-              child.name.includes('Bar') ||
-              child.material?.name?.includes('Chocolate') ||
-              child.name === 'GoProTeen_Inner_Chocolate_Bar'
-            ) {
-              foundInner = child;
-            }
-          }
-        });
+        const foundWrapper = (gltf.scene.getObjectByName('GoProTeen_Main_Wrapper') as THREE.Mesh) || null;
+        const foundInner = gltf.scene.getObjectByName('GP_EXPLODE_CONTROLLER') || null;
 
         cachedModelData = { wrapperMesh: foundWrapper, innerMesh: foundInner };
         resolve(cachedModelData);
@@ -255,6 +235,8 @@ export default function GoProteenProduct({
           wClone.scale.setScalar(scaleFactor);
           if (wClone.material) {
             const mat = (wClone.material as THREE.MeshStandardMaterial).clone();
+            mat.transparent = false;
+            mat.opacity = 1.0;
             mat.roughness = 0.26;
             mat.metalness = 0.04;
             mat.envMapIntensity = 1.25;
@@ -265,15 +247,7 @@ export default function GoProteenProduct({
 
         if (innerMesh) {
           const iClone = innerMesh.clone(true);
-          iClone.scale.setScalar(scaleFactor);
-          if (iClone.material) {
-            const bMat = (iClone.material as THREE.MeshStandardMaterial).clone();
-            bMat.bumpMap = bumpMap;
-            bMat.bumpScale = 1.2;
-            bMat.roughness = 0.38;
-            bMat.envMapIntensity = 0.8;
-            iClone.material = bMat;
-          }
+          iClone.visible = false;
           productGroup.add(iClone);
         }
       }

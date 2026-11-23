@@ -12,15 +12,15 @@ export default function ProductStoryFlow() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full bg-[#FDFBF7] text-[#14091F] font-sans selection:bg-[#9333EA]/20"
+      className="relative w-full bg-transparent text-[#14091F] font-sans selection:bg-[#9333EA]/20"
       style={{ minHeight: '800vh' }}
     >
       {/* Background Ambient Radial Gradient Aura */}
       <div
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full pointer-events-none opacity-25 blur-[160px] z-0"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full pointer-events-none opacity-30 blur-[160px] z-0"
         style={{
           background:
-            'radial-gradient(circle, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.18) 45%, rgba(253,251,247,0) 75%)',
+            'radial-gradient(circle at 40% 40%, rgba(16,185,129,0.22) 0%, rgba(236,72,153,0.18) 40%, rgba(168,85,247,0.15) 60%, transparent 80%)',
         }}
       />
 

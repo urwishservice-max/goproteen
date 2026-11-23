@@ -76,7 +76,7 @@ export default function CleanLabelGuaranteeSection() {
       id="clean-label-guarantee"
       data-bar="0.56 -0.09 1.12 0 0.12 1 1 0"
       data-orb="0.52 -0.08 1.25 320 0.55"
-      className="relative z-10 w-full pt-28 pb-24 sm:pt-36 sm:pb-32 px-6 sm:px-12 lg:px-20 bg-transparent text-[#14091F] overflow-hidden"
+      className="relative z-10 w-full pt-16 pb-16 sm:pt-32 sm:pb-32 px-4 sm:px-12 lg:px-20 bg-transparent text-[#14091F] overflow-hidden"
     >
       {/* Background Soft Glows */}
       <div
@@ -89,8 +89,8 @@ export default function CleanLabelGuaranteeSection() {
 
       <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col">
         {/* Top Header Bar */}
-        <div className="w-full flex items-center justify-between mb-12 sm:mb-16">
-          <div className="flex items-center gap-3">
+        <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-8 sm:mb-14">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="mono text-xs font-mono tracking-widest uppercase text-[#8A7993]">
               SCENE 8: READING THE FINE PRINT
             </span>
@@ -103,7 +103,7 @@ export default function CleanLabelGuaranteeSection() {
           <button
             type="button"
             onClick={toggleListen}
-            className="group flex items-center gap-2.5 px-5 py-2 rounded-full border border-[#E5DFD7] bg-white/80 hover:bg-white hover:border-[#14091F] transition-all duration-300 text-xs font-mono uppercase tracking-wider text-[#14091F] shadow-sm backdrop-blur-sm cursor-pointer"
+            className="group flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full border border-[#E5DFD7] bg-white/80 hover:bg-white hover:border-[#14091F] transition-all duration-300 text-xs font-mono uppercase tracking-wider text-[#14091F] shadow-sm backdrop-blur-sm cursor-pointer self-start sm:self-auto"
           >
             <span
               className={`w-2 h-2 rounded-full transition-colors duration-300 ${
@@ -116,12 +116,12 @@ export default function CleanLabelGuaranteeSection() {
 
         {/* Section Headline */}
         <div className="max-w-3xl mb-8 sm:mb-12">
-          <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] mb-4 block">
+          <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] mb-3 sm:mb-4 block">
             The Clean-Label Guarantee
           </span>
 
           <h2
-            className="text-[3.0rem] sm:text-[4.4rem] lg:text-[5.4rem] font-light tracking-tight leading-[1.02] text-[#14091F] mb-6"
+            className="text-[2.2rem] sm:text-[3.6rem] lg:text-[5.4rem] font-light tracking-tight leading-[1.04] sm:leading-[1.02] text-[#14091F] mb-4 sm:mb-6"
             style={{ letterSpacing: '-0.035em' }}
           >
             The fine print{' '}
@@ -132,18 +132,18 @@ export default function CleanLabelGuaranteeSection() {
         </div>
 
         {/* Editorial Narrative Split: The Reality vs. 3D Model Center Stage vs. The Purity */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 pb-20 border-b border-[#EBE5DE]/80">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center pt-2 sm:pt-4 pb-14 sm:pb-20 border-b border-[#EBE5DE]/80">
           <div className="lg:col-span-4 text-left flex flex-col justify-center">
-            <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A7993] mb-3 block">
+            <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A7993] mb-2 sm:mb-3 block">
               The Commercial Reality
             </span>
-            <p className="text-base sm:text-lg text-[#5D5066] font-light leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-lg text-[#5D5066] font-light leading-relaxed">
               “When you pick up a commercial ‘health’ or ‘protein’ bar... turn it over in your hand... and discover a long list of artificial sugars, palm oils, synthetic fillers, and dairy isolates hidden behind flashy marketing claims.”
             </p>
           </div>
 
           {/* Center Stage: Dedicated empty space for the persistent 3D product model */}
-          <div className="lg:col-span-4 min-h-[300px] sm:min-h-[360px] flex items-center justify-center pointer-events-none relative">
+          <div className="lg:col-span-4 min-h-[220px] sm:min-h-[300px] lg:min-h-[360px] flex items-center justify-center pointer-events-none relative my-2 lg:my-0">
             {/* Subtle soft aura glow accentuating the 3D bar */}
             <div
               className="w-56 h-56 rounded-full pointer-events-none opacity-40 blur-2xl"
@@ -155,24 +155,24 @@ export default function CleanLabelGuaranteeSection() {
           </div>
 
           <div className="lg:col-span-4 text-left lg:pl-4 flex flex-col justify-center">
-            <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A7993] mb-3 block">
+            <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A7993] mb-2 sm:mb-3 block">
               The GoProteen Promise
             </span>
-            <p className="text-xl sm:text-2xl text-[#14091F] font-normal leading-relaxed">
+            <p className="text-lg sm:text-xl lg:text-2xl text-[#14091F] font-normal leading-relaxed">
               You can feel complete peace of mind knowing we believe in{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9333EA] to-[#E11D48] font-medium">
                 total purity.
               </span>
             </p>
-            <span className="text-xs font-mono tracking-widest uppercase text-[#8A7993] mt-3">
+            <span className="text-[11px] sm:text-xs font-mono tracking-widest uppercase text-[#8A7993] mt-2 sm:mt-3">
               Transparent Formulations · Zero Compromises
             </span>
           </div>
         </div>
 
         {/* THE 9 "NO"s: Clean-Label Exclusion Strip */}
-        <div className="py-12 sm:py-16 border-b border-[#EBE5DE]/80">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="py-10 sm:py-16 border-b border-[#EBE5DE]/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
             <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#8A7993]">
               Clean-Label Commitments
             </span>
@@ -181,11 +181,11 @@ export default function CleanLabelGuaranteeSection() {
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2.5 sm:gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {CLEAN_LABEL_EXCLUSIONS.map((item, idx) => (
               <div
                 key={idx}
-                className="group flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-full bg-white/90 border border-[#E5DFD7] shadow-sm hover:border-[#14091F] transition-all duration-300"
+                className="group flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/90 border border-[#E5DFD7] shadow-sm hover:border-[#14091F] transition-all duration-300"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 group-hover:scale-125 transition-transform" />
                 <span className="text-xs sm:text-[13px] font-mono tracking-wider uppercase text-[#14091F] font-medium">
@@ -200,15 +200,15 @@ export default function CleanLabelGuaranteeSection() {
         <div
           data-bar="1.3 0.6 0.42 0.3 0 0.25 1 0"
           data-orb="1 0 .8 300 .45"
-          className="pt-14 sm:pt-20"
+          className="pt-12 sm:pt-20"
         >
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-8 sm:mb-10">
             <div>
               <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.25em] uppercase text-[#8A7993] block mb-2">
                 Nutritional Architecture
               </span>
               <h3
-                className="text-2xl sm:text-3xl lg:text-4xl font-light text-[#14091F] tracking-tight"
+                className="text-xl sm:text-3xl lg:text-4xl font-light text-[#14091F] tracking-tight"
                 style={{ letterSpacing: '-0.025em' }}
               >
                 Max-Bioavailable Protein Matrix
@@ -219,17 +219,17 @@ export default function CleanLabelGuaranteeSection() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             {MATRIX_SPECS.map((spec, idx) => (
               <div
                 key={idx}
-                className="p-7 rounded-2xl bg-white/70 border border-[#E5DFD7] shadow-sm hover:shadow-md hover:border-[#9333EA]/50 transition-all duration-300 flex flex-col justify-between"
+                className="p-5 sm:p-7 rounded-2xl bg-white/70 border border-[#E5DFD7] shadow-sm hover:shadow-md hover:border-[#9333EA]/50 transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <div className="text-3xl sm:text-4xl font-light text-[#14091F] tracking-tight mb-2">
+                  <div className="text-2xl sm:text-4xl font-light text-[#14091F] tracking-tight mb-2">
                     {spec.metric}
                   </div>
-                  <div className="text-sm font-medium font-mono uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#9333EA] to-[#E11D48] mb-3">
+                  <div className="text-xs sm:text-sm font-medium font-mono uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#9333EA] to-[#E11D48] mb-2 sm:mb-3">
                     {spec.label}
                   </div>
                 </div>

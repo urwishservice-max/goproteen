@@ -58,7 +58,7 @@ export default function CellResponseExperience({
   const [receptorResisting, setReceptorResisting] = useState(false);
   const [totalAbsorbed, setTotalAbsorbed] = useState(0);
   const [totalRejected, setTotalRejected] = useState(0);
-  const [feedbackMessage, setFeedbackMessage] = useState('👆 Drag any protein cell to the muscle fibers');
+  const [feedbackMessage, setFeedbackMessage] = useState('👆 Drag protein to muscle fibers');
   const [feedbackType, setFeedbackType] = useState('normal'); // 'normal' | 'success' | 'warn'
 
   // Acceptance probability based on age:
@@ -153,9 +153,9 @@ export default function CellResponseExperience({
     const pct = Math.round(responseFactor * 100);
     setFeedbackType('success');
     if (userAge <= 35) {
-      setFeedbackMessage(`✓ Signal Accepted! Protein synthesized instantly (${pct}% response)`);
+      setFeedbackMessage(`✓ Absorbed (+${pct}% synthesis)`);
     } else {
-      setFeedbackMessage(`✓ Signal Penetrated! Cell finally absorbed leucine (${pct}% response)`);
+      setFeedbackMessage(`✓ Absorbed (+${pct}% response)`);
     }
 
     if (onAbsorb) {
@@ -212,17 +212,11 @@ export default function CellResponseExperience({
     const rejectPct = Math.round((1 - getAcceptanceRate(userAge)) * 100);
     setFeedbackType('warn');
     if (userAge >= 60) {
-      setFeedbackMessage(
-        `❌ Signal Resisted (~${rejectPct}% Rejection Rate at Age 60): Hard-of-hearing cell rejected protein! Try again.`
-      );
+      setFeedbackMessage(`❌ Resisted (~${rejectPct}% at age 60) · Try again`);
     } else if (userAge >= 50) {
-      setFeedbackMessage(
-        `❌ Signal Resisted (~${rejectPct}% Rejection Rate at Age 50): Anabolic resistance blocked absorption! Try again.`
-      );
+      setFeedbackMessage(`❌ Resisted (~${rejectPct}% at age 50) · Try again`);
     } else {
-      setFeedbackMessage(
-        `❌ Signal Resisted (~${rejectPct}% Rejection Rate): Cell resisted standard signal. Try again.`
-      );
+      setFeedbackMessage(`❌ Resisted (~${rejectPct}%) · Try again`);
     }
 
     // 2. After 350ms of resistance shake, smoothly spring back to base position
@@ -413,7 +407,7 @@ export default function CellResponseExperience({
           }}
         />
         <div
-          className={`w-8 h-8 rounded-full shadow-md flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
+          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full shadow-md flex items-center justify-center font-bold text-xs sm:text-sm transition-colors duration-300 ${
             receptorResisting
               ? 'bg-rose-500 text-white shadow-[0_0_16px_rgba(244,63,94,0.8)]'
               : 'bg-white/90 backdrop-blur-xs text-stone-800'
@@ -525,32 +519,32 @@ export default function CellResponseExperience({
           >
             {/* Halo Ring & Leucine 3D Molecule */}
             <div
-              className={`relative p-2 rounded-full transition-all duration-300 ${
+              className={`relative p-1.5 sm:p-2 rounded-full transition-all duration-300 ${
                 isRejected
-                  ? 'ring-4 ring-rose-500 bg-rose-500/25 shadow-[0_0_24px_rgba(244,63,94,0.85)] scale-110'
+                  ? 'ring-3 sm:ring-4 ring-rose-500 bg-rose-500/25 shadow-[0_0_20px_rgba(244,63,94,0.85)] scale-110'
                   : isDragging
-                  ? 'ring-4 ring-amber-400/80 shadow-[0_0_24px_rgba(251,191,36,0.8)] bg-white/70'
-                  : 'ring-2 ring-white/80 shadow-[0_4px_16px_rgba(157,38,130,0.22)] bg-white/45 backdrop-blur-xs hover:ring-amber-400/60 hover:scale-105'
+                  ? 'ring-3 sm:ring-4 ring-amber-400/80 shadow-[0_0_20px_rgba(251,191,36,0.8)] bg-white/70'
+                  : 'ring-1.5 sm:ring-2 ring-white/80 shadow-[0_4px_14px_rgba(157,38,130,0.2)] bg-white/45 backdrop-blur-xs hover:ring-amber-400/60 hover:scale-105'
               }`}
             >
               <img
                 src="/images/leucine_molecule.png"
                 alt={cell.name}
-                className="w-11 h-11 sm:w-13 sm:h-13 object-contain pointer-events-none"
+                className="w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 object-contain pointer-events-none"
                 style={{
                   filter: isRejected
-                    ? 'drop-shadow(0 0 10px rgba(244, 63, 94, 0.9))'
+                    ? 'drop-shadow(0 0 8px rgba(244, 63, 94, 0.9))'
                     : isDragging
-                    ? 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.8))'
-                    : 'drop-shadow(0 4px 8px rgba(20, 9, 31, 0.15))',
+                    ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.8))'
+                    : 'drop-shadow(0 3px 6px rgba(20, 9, 31, 0.15))',
                 }}
                 draggable={false}
               />
 
               {/* Hand hint for the first idle cell */}
-              {cell.id === 1 && !isDragging && cell.absorbCount === 0 && (
+              {cell.id === 1 && !isDragging && cell.absorCount === 0 && (
                 <div
-                  className="absolute -right-2 -bottom-2 text-base pointer-events-none"
+                  className="absolute -right-1.5 -bottom-1.5 text-xs sm:text-base pointer-events-none"
                   style={{ animation: 'bounceSubtle 1.8s infinite' }}
                 >
                   👆
@@ -560,17 +554,17 @@ export default function CellResponseExperience({
 
             {/* Protein Label Pill */}
             <div
-              className={`mt-1 px-2 py-0.5 rounded-full text-center shadow-xs backdrop-blur-xs pointer-events-none transition-colors duration-300 ${
+              className={`mt-0.5 px-1.5 py-0.5 rounded-full text-center shadow-xs backdrop-blur-xs pointer-events-none transition-colors duration-300 ${
                 isRejected
                   ? 'bg-rose-500 text-white font-bold'
                   : 'bg-white/90 text-stone-800'
               }`}
             >
-              <span className="block text-[10px] font-semibold tracking-tight leading-tight">
+              <span className="block text-[8px] sm:text-[10px] font-semibold tracking-tight leading-tight">
                 {isRejected ? 'Resisted!' : cell.name}
               </span>
-              <span className={`block text-[8px] font-mono leading-none ${isRejected ? 'text-white/80' : 'text-stone-500'}`}>
-                {isRejected ? 'Bouncing back' : 'Protein'}
+              <span className={`block text-[7px] sm:text-[8px] font-mono leading-none ${isRejected ? 'text-white/80' : 'text-stone-500'}`}>
+                {isRejected ? 'Deflected' : 'Protein'}
               </span>
             </div>
           </div>
@@ -579,7 +573,7 @@ export default function CellResponseExperience({
 
       {/* 5. Top Dynamic Status Pill with Live Stats */}
       <div
-        className={`absolute top-2 sm:top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 shadow-xs z-40 flex items-center gap-2 max-w-[92vw] text-center ${
+        className={`absolute top-1 sm:top-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium transition-all duration-300 shadow-xs z-40 flex items-center justify-center gap-1.5 max-w-[92vw] whitespace-nowrap overflow-hidden text-ellipsis text-center ${
           feedbackType === 'success'
             ? 'bg-amber-500 text-white shadow-[0_2px_12px_rgba(245,158,11,0.4)]'
             : feedbackType === 'warn'
@@ -587,10 +581,10 @@ export default function CellResponseExperience({
             : 'bg-white/90 text-stone-800 backdrop-blur-xs'
         }`}
       >
-        <span>{feedbackMessage}</span>
+        <span className="truncate">{feedbackMessage}</span>
         {(totalAbsorbed > 0 || totalRejected > 0) && (
-          <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono shrink-0">
-            ✓ {totalAbsorbed} | ✕ {totalRejected}
+          <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[9px] font-mono shrink-0">
+            ✓{totalAbsorbed} ✕{totalRejected}
           </span>
         )}
       </div>

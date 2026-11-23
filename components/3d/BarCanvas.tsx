@@ -45,12 +45,14 @@ export default function BarCanvas({
     }
 
     // 2. Renderer & Scene
+    const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 800 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: window.innerWidth > 800,
+      antialias: !isMobile,
+      powerPreference: isMobile ? 'default' : 'high-performance',
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
 
     const scene = new THREE.Scene();

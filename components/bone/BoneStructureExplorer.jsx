@@ -270,7 +270,7 @@ export default function BoneStructureExplorer({
         <div className="lg:col-span-8 relative flex flex-col items-center justify-center overflow-visible">
           {/* TAB 1: BONE LAYERS (Large 3D Cutaway Femur Bone with Dynamic Age Deformation) */}
           {activeTab === 'layers' && (
-            <div className="relative w-full h-[460px] sm:h-[500px] lg:h-[540px] xl:h-[580px] max-h-[72vh] flex items-center justify-center overflow-visible">
+            <div className="relative w-full h-[260px] sm:h-[360px] lg:h-[540px] xl:h-[580px] max-h-[72vh] flex items-center justify-center overflow-visible my-2 lg:my-0">
               {/* Interactive 3D Femur with Real-time 3D Trabecular Deformation */}
               <div className="w-full h-full relative overflow-visible">
                 <InteractiveFemur age={femurAge} />
